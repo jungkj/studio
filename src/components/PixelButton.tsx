@@ -7,13 +7,15 @@ interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
 
 const PixelButton = React.forwardRef<HTMLButtonElement, PixelButtonProps>(
   ({ className, variant = 'default', children, ...props }, ref) => {
-    const baseClasses = "px-4 py-2 text-sm font-pixel cursor-pointer pixel-border pixel-shadow active:pixel-border-inset";
+    // Base classes for all buttons, applying the macOS outset border
+    const baseClasses = "px-4 py-2 text-sm cursor-pointer mac-border-outset active:mac-border-inset";
 
+    // Variant-specific classes using the new macOS grayscale palette
     const variantClasses = {
-      default: "bg-emerald-light-green text-emerald-black border-emerald-border",
-      primary: "bg-emerald-dark-green text-emerald-white border-emerald-border",
-      secondary: "bg-emerald-light-blue text-emerald-black border-emerald-border",
-      danger: "bg-red-600 text-emerald-white border-emerald-border",
+      default: "bg-mac-light-gray text-mac-black", // Standard button
+      primary: "bg-mac-medium-gray text-mac-black", // Slightly darker for primary actions
+      secondary: "bg-mac-light-gray text-mac-black", // Similar to default, but can be used for semantic clarity
+      danger: "bg-red-600 text-mac-white", // Keep red for danger, but with white text
     };
 
     return (
