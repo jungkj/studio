@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import Draggable from 'react-draggable';
-import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PixelButton } from './PixelButton';
 
@@ -21,25 +20,29 @@ const Window: React.FC<WindowProps> = ({ title, children, onClose, initialPositi
       nodeRef={nodeRef}
       handle=".window-header"
       defaultPosition={initialPosition}
-      bounds="parent" // Keep window within its parent container
+      bounds="parent"
     >
       <div
         ref={nodeRef}
         className={cn(
-          "absolute bg-mac-white text-mac-black mac-border-outset", // Apply macOS white background and outset border
+          "absolute bg-mac-white text-mac-black mac-border-outset",
           "min-w-[300px] min-h-[200px] flex flex-col",
           className
         )}
         style={{ zIndex }}
         onMouseDown={onFocus}
       >
-        <div className="window-header flex justify-between items-center bg-mac-medium-gray text-mac-black px-2 py-0.5 cursor-grab mac-border-inset"> {/* macOS title bar style, adjusted padding */}
-          <span className="font-sans text-sm">{title}</span> {/* Use system font for title, removed font-bold */}
-          <PixelButton onClick={onClose} variant="danger" className="w-5 h-5 p-0 flex items-center justify-center"> {/* Smaller button */}
-            <X size={14} /> {/* Smaller icon */}
-          </PixelButton>
+        <div
+          className="window-header flex items-center justify-start bg-mac-medium-gray text-mac-black px-2 py-0.5 cursor-grab mac-border-inset"
+          style={{
+            backgroundImage: "repeating-linear-gradient(to bottom, hsla(0,0%,100%,.25), hsla(0,0%,100%,.25) 1px, transparent 1px, transparent 2px)",
+            backgroundSize: "100% 2px"
+          }}
+        >
+          <PixelButton onClick={onClose} variant="default" className="w-4 h-4 p-0 flex items-center justify-center" />
+          <span className="font-sans text-sm flex-grow text-center pr-4">{title}</span>
         </div>
-        <div className="p-2 flex-grow overflow-auto"> {/* Adjusted padding */}
+        <div className="p-2 flex-grow overflow-auto">
           {children}
         </div>
       </div>
