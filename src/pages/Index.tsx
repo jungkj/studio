@@ -85,7 +85,7 @@ const Index = () => {
     });
   };
 
-  const iconBaseUrl = "https://raw.githubusercontent.com/amanchokshi/retro-icons/main/icons";
+  const iconBaseUrl = "/icons"; // Use local icons from the /public directory
 
   return (
     <div className="min-h-screen w-full mac-desktop-bg flex flex-col relative overflow-hidden">
