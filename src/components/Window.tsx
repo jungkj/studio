@@ -10,8 +10,8 @@ interface WindowProps {
   onClose: () => void;
   initialPosition?: { x: number; y: number };
   className?: string;
-  zIndex?: number; // New prop for z-index
-  onFocus?: () => void; // New prop for focus event
+  zIndex?: number;
+  onFocus?: () => void;
 }
 
 const Window: React.FC<WindowProps> = ({ title, children, onClose, initialPosition, className, zIndex = 1, onFocus }) => {
@@ -23,15 +23,15 @@ const Window: React.FC<WindowProps> = ({ title, children, onClose, initialPositi
     >
       <div
         className={cn(
-          "absolute bg-emerald-white text-emerald-black pixel-border border-emerald-border pixel-shadow",
+          "absolute bg-mac-white text-mac-black mac-border-outset", // Apply macOS white background and outset border
           "min-w-[300px] min-h-[200px] flex flex-col",
           className
         )}
-        style={{ zIndex }} // Apply z-index here
-        onMouseDown={onFocus} // Call onFocus when window is clicked
+        style={{ zIndex }}
+        onMouseDown={onFocus}
       >
-        <div className="window-header flex justify-between items-center bg-emerald-dark-blue text-emerald-white px-2 py-1 cursor-grab pixel-border-inset border-emerald-border">
-          <span className="font-pixel text-sm">{title}</span>
+        <div className="window-header flex justify-between items-center bg-mac-medium-gray text-mac-black px-2 py-1 cursor-grab mac-border-inset"> {/* macOS title bar style */}
+          <span className="font-sans text-sm font-bold">{title}</span> {/* Use system font for title */}
           <PixelButton onClick={onClose} variant="danger" className="w-6 h-6 p-0 flex items-center justify-center">
             <X size={16} />
           </PixelButton>
