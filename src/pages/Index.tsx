@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
-import { EssaysApp } from '@/components/EssaysApp'; // Changed from BlogApp to EssaysApp
+import { EssaysApp } from '@/components/EssaysApp';
 import { AboutApp } from '@/components/AboutApp';
 import { MyComputerApp } from '@/components/MyComputerApp';
 import { NotesApp } from '@/components/NotesApp';
-import { GamesApp } from '@/components/GamesApp'; // Import GamesApp
+import { GamesApp } from '@/components/GamesApp';
+import { CalculatorApp } from '@/components/CalculatorApp'; // Import CalculatorApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, NotebookText, Gamepad2 } from 'lucide-react'; // Added Gamepad2 icon
+import { FileText, User, Monitor, Trash2, NotebookText, Gamepad2, Calculator } from 'lucide-react'; // Added Calculator icon
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'notes' | 'games'; // Updated 'blog' to 'essays', added 'games'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'notes' | 'games' | 'calculator'; // Added 'calculator'
 
 interface WindowState {
   isOpen: boolean;
@@ -21,14 +22,15 @@ interface WindowState {
 
 const Index = () => {
   const [windowStates, setWindowStates] = useState<Record<WindowName, WindowState>>({
-    essays: { isOpen: false, zIndex: 10 }, // Updated 'blog' to 'essays'
+    essays: { isOpen: false, zIndex: 10 },
     about: { isOpen: false, zIndex: 11 },
     myComputer: { isOpen: false, zIndex: 12 },
     notes: { isOpen: false, zIndex: 13 },
-    games: { isOpen: false, zIndex: 14 }, // Initial z-index for Games
+    games: { isOpen: false, zIndex: 14 },
+    calculator: { isOpen: false, zIndex: 15 }, // Initial z-index for Calculator
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(14); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(15); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -74,18 +76,19 @@ const Index = () => {
 
       {/* Desktop Icons */}
       <div className="p-4 flex flex-col items-start space-y-2">
-        <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} /> {/* Updated label */}
+        <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
         <DesktopIcon icon={NotebookText} label="Notes" onClick={() => openWindow('notes')} />
-        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('games')} /> {/* New Games Icon */}
+        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('games')} />
+        <DesktopIcon icon={Calculator} label="Calculator" onClick={() => openWindow('calculator')} /> {/* New Calculator Icon */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
       {/* Active Windows */}
       {windowStates.essays.isOpen && (
         <Window
-          title="My Essays" // Updated title
+          title="My Essays"
           onClose={() => closeWindow('essays')}
           initialPosition={{ x: 50, y: 50 }}
           zIndex={windowStates.essays.zIndex}
@@ -136,6 +139,17 @@ const Index = () => {
           onFocus={() => focusWindow('games')}
         >
           <GamesApp onClose={() => closeWindow('games')} />
+        </Window>
+      )}
+      {windowStates.calculator.isOpen && (
+        <Window
+          title="Calculator"
+          onClose={() => closeWindow('calculator')}
+          initialPosition={{ x: 550, y: 300 }}
+          zIndex={windowStates.calculator.zIndex}
+          onFocus={() => focusWindow('calculator')}
+        >
+          <CalculatorApp onClose={() => closeWindow('calculator')} />
         </Window>
       )}
 
