@@ -4,18 +4,19 @@ import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
 import { AboutApp } from '@/components/AboutApp';
 import { MyComputerApp } from '@/components/MyComputerApp';
-import { GamesLauncherApp } from '@/components/GamesLauncherApp'; // Renamed and updated import
-import { TicTacToe } from '@/components/TicTacToe'; // Keep TicTacToe for direct window
-import { SnakeGame } from '@/components/SnakeGame'; // New game import
-import { SudokuGame } from '@/components/SudokuGame'; // New game import
-import { SolitaireGame } from '@/components/SolitaireGame'; // New game import
+import { GamesLauncherApp } from '@/components/GamesLauncherApp';
+import { TicTacToe } from '@/components/TicTacToe';
+import { SnakeGame } from '@/components/SnakeGame';
+import { SudokuGame } from '@/components/SudokuGame';
+import { SolitaireGame } from '@/components/SolitaireGame';
+import { ContactApp } from '@/components/ContactApp'; // New import for ContactApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, Gamepad2 } from 'lucide-react'; // Removed NotebookText and Calculator icons
+import { FileText, User, Monitor, Trash2, Gamepad2, Mail } from 'lucide-react'; // Added Mail icon
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire'; // Updated types
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact'; // Added 'contact'
 
 interface WindowState {
   isOpen: boolean;
@@ -27,14 +28,15 @@ const Index = () => {
     essays: { isOpen: false, zIndex: 10 },
     about: { isOpen: false, zIndex: 11 },
     myComputer: { isOpen: false, zIndex: 12 },
-    gamesLauncher: { isOpen: false, zIndex: 13 }, // Games launcher window
-    ticTacToe: { isOpen: false, zIndex: 14 }, // Individual game window
-    snake: { isOpen: false, zIndex: 15 }, // Individual game window
-    sudoku: { isOpen: false, zIndex: 16 }, // Individual game window
-    solitaire: { isOpen: false, zIndex: 17 }, // Individual game window
+    gamesLauncher: { isOpen: false, zIndex: 13 },
+    ticTacToe: { isOpen: false, zIndex: 14 },
+    snake: { isOpen: false, zIndex: 15 },
+    sudoku: { isOpen: false, zIndex: 16 },
+    solitaire: { isOpen: false, zIndex: 17 },
+    contact: { isOpen: false, zIndex: 18 }, // Initial z-index for Contact
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(17); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(18); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -83,7 +85,8 @@ const Index = () => {
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
-        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} /> {/* Opens the launcher */}
+        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} />
+        <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} /> {/* New Contact Icon */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
@@ -177,6 +180,17 @@ const Index = () => {
           onFocus={() => focusWindow('solitaire')}
         >
           <SolitaireGame onClose={() => closeWindow('solitaire')} />
+        </Window>
+      )}
+      {windowStates.contact.isOpen && (
+        <Window
+          title="Contact Me"
+          onClose={() => closeWindow('contact')}
+          initialPosition={{ x: 600, y: 450 }}
+          zIndex={windowStates.contact.zIndex}
+          onFocus={() => focusWindow('contact')}
+        >
+          <ContactApp onClose={() => closeWindow('contact')} />
         </Window>
       )}
 
