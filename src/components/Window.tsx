@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Draggable from 'react-draggable';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,13 +15,16 @@ interface WindowProps {
 }
 
 const Window: React.FC<WindowProps> = ({ title, children, onClose, initialPosition, className, zIndex = 1, onFocus }) => {
+  const nodeRef = useRef(null);
   return (
     <Draggable
+      nodeRef={nodeRef}
       handle=".window-header"
       defaultPosition={initialPosition}
       bounds="parent" // Keep window within its parent container
     >
       <div
+        ref={nodeRef}
         className={cn(
           "absolute bg-mac-white text-mac-black mac-border-outset", // Apply macOS white background and outset border
           "min-w-[300px] min-h-[200px] flex flex-col",
