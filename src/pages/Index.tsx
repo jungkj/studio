@@ -3,14 +3,15 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
 import { BlogApp } from '@/components/BlogApp';
 import { AboutApp } from '@/components/AboutApp';
+import { MyComputerApp } from '@/components/MyComputerApp';
+import { NotesApp } from '@/components/NotesApp'; // Import NotesApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2 } from 'lucide-react'; // Added Trash2 icon
-import { MyComputerApp } from '@/components/MyComputerApp';
-import { toast } from 'sonner'; // Import toast for notifications
+import { FileText, User, Monitor, Trash2, NotebookText } from 'lucide-react'; // Added NotebookText icon
+import { toast } from 'sonner';
 
-type WindowName = 'blog' | 'about' | 'myComputer';
+type WindowName = 'blog' | 'about' | 'myComputer' | 'notes'; // Added 'notes'
 
 interface WindowState {
   isOpen: boolean;
@@ -22,9 +23,10 @@ const Index = () => {
     blog: { isOpen: false, zIndex: 10 },
     about: { isOpen: false, zIndex: 11 },
     myComputer: { isOpen: false, zIndex: 12 },
+    notes: { isOpen: false, zIndex: 13 }, // Initial z-index for Notes
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(12);
+  const [maxZIndex, setMaxZIndex] = useState(13); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -73,7 +75,8 @@ const Index = () => {
         <DesktopIcon icon={FileText} label="My Blog" onClick={() => openWindow('blog')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
-        <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} /> {/* New Trash Icon */}
+        <DesktopIcon icon={NotebookText} label="Notes" onClick={() => openWindow('notes')} /> {/* New Notes Icon */}
+        <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
       {/* Active Windows */}
@@ -108,6 +111,17 @@ const Index = () => {
           onFocus={() => focusWindow('myComputer')}
         >
           <MyComputerApp onClose={() => closeWindow('myComputer')} />
+        </Window>
+      )}
+      {windowStates.notes.isOpen && (
+        <Window
+          title="Notes"
+          onClose={() => closeWindow('notes')}
+          initialPosition={{ x: 350, y: 200 }}
+          zIndex={windowStates.notes.zIndex}
+          onFocus={() => focusWindow('notes')}
+        >
+          <NotesApp onClose={() => closeWindow('notes')} />
         </Window>
       )}
 
