@@ -11,14 +11,14 @@ import { SudokuGame } from '@/components/SudokuGame';
 import { SolitaireGame } from '@/components/SolitaireGame';
 import { ContactApp } from '@/components/ContactApp';
 import { WorkApp } from '@/components/WorkApp';
-import { TerminalApp } from '@/components/TerminalApp'; // New import for TerminalApp
+import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react'; // Added Terminal icon
+import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal'; // Added 'terminal'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal';
 
 interface WindowState {
   isOpen: boolean;
@@ -37,10 +37,10 @@ const Index = () => {
     solitaire: { isOpen: false, zIndex: 17 },
     contact: { isOpen: false, zIndex: 18 },
     work: { isOpen: false, zIndex: 19 },
-    terminal: { isOpen: false, zIndex: 20 }, // Initial z-index for Terminal
+    terminal: { isOpen: false, zIndex: 20 },
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(20); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(20);
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -85,14 +85,14 @@ const Index = () => {
       <MenuBar />
 
       {/* Desktop Icons */}
-      <div className="p-4 flex flex-col items-start space-y-2">
+      <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 auto-rows-min items-start"> {/* Changed to a 2-column grid */}
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
         <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} />
         <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} />
         <DesktopIcon icon={Briefcase} label="My Work" onClick={() => openWindow('work')} />
-        <DesktopIcon icon={Terminal} label="Terminal" onClick={() => openWindow('terminal')} /> {/* New Terminal Icon */}
+        <DesktopIcon icon={Terminal} label="Terminal" onClick={() => openWindow('terminal')} />
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
