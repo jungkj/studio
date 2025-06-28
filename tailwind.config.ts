@@ -18,6 +18,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        pixel: ['"Press Start 2P"', 'cursive'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -62,6 +65,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Pokemon Emerald inspired colors
+        'emerald-dark-green': '#386040',
+        'emerald-light-green': '#68A070',
+        'emerald-dark-blue': '#284060',
+        'emerald-light-blue': '#5078A0',
+        'emerald-white': '#F8F8F8',
+        'emerald-black': '#202020',
+        'emerald-border': '#181818',
       },
       borderRadius: {
         lg: "var(--radius)",

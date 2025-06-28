@@ -96,6 +96,24 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-pixel; /* Apply pixel font here */
   }
+}
+
+/* Custom pixelated border styles */
+.pixel-border {
+  border-style: solid;
+  border-width: 2px; /* Adjust as needed for pixel effect */
+  border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6"><rect x="0" y="0" width="2" height="2" fill="%23181818"/><rect x="2" y="0" width="2" height="2" fill="%23181818"/><rect x="4" y="0" width="2" height="2" fill="%23181818"/><rect x="0" y="2" width="2" height="2" fill="%23181818"/><rect x="4" y="2" width="2" height="2" fill="%23181818"/><rect x="0" y="4" width="2" height="2" fill="%23181818"/><rect x="2" y="4" width="2" height="2" fill="%23181818"/><rect x="4" y="4" width="2" height="2" fill="%23181818"/></svg>') 2 stretch;
+  image-rendering: pixelated;
+}
+
+.pixel-border-inset {
+  border-style: inset;
+  border-width: 2px;
+  border-color: #888 #eee #eee #888; /* Simulates old UI inset */
+}
+
+.pixel-shadow {
+  box-shadow: 2px 2px 0px 0px var(--emerald-black); /* Simple pixel shadow */
 }
