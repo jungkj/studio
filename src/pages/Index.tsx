@@ -103,7 +103,7 @@ const Index = () => {
         <Window
           title="Welcome"
           onClose={() => closeWindow('welcome')}
-          initialPosition={{ x: 100, y: 80 }} {/* Adjusted initial position */}
+          initialPosition={{ x: 100, y: 80 }}
           zIndex={windowStates.welcome.zIndex}
           onFocus={() => focusWindow('welcome')}
         >
