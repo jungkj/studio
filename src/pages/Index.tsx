@@ -3,12 +3,13 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
 import { BlogApp } from '@/components/BlogApp';
 import { AboutApp } from '@/components/AboutApp';
-import { MenuBar } from '@/components/MenuBar'; // Import MenuBar
-import { SystemTray } from '@/components/SystemTray'; // Import SystemTray
-import { DesktopIcon } from '@/components/DesktopIcon'; // Import DesktopIcon
-import { FileText, User, Trash2 } from 'lucide-react'; // Import icons for DesktopIcon
+import { MenuBar } from '@/components/MenuBar';
+import { SystemTray } from '@/components/SystemTray';
+import { DesktopIcon } from '@/components/DesktopIcon';
+import { FileText, User, Monitor } from 'lucide-react'; // Added Monitor icon
+import { MyComputerApp } from '@/components/MyComputerApp'; // Import MyComputerApp
 
-type WindowName = 'blog' | 'about';
+type WindowName = 'blog' | 'about' | 'myComputer'; // Added 'myComputer'
 
 interface WindowState {
   isOpen: boolean;
@@ -19,9 +20,10 @@ const Index = () => {
   const [windowStates, setWindowStates] = useState<Record<WindowName, WindowState>>({
     blog: { isOpen: false, zIndex: 10 },
     about: { isOpen: false, zIndex: 11 },
+    myComputer: { isOpen: false, zIndex: 12 }, // Initial z-index for My Computer
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(11); // Keep track of the highest z-index
+  const [maxZIndex, setMaxZIndex] = useState(12); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -65,6 +67,7 @@ const Index = () => {
       <div className="p-4 flex flex-col items-start space-y-2">
         <DesktopIcon icon={FileText} label="My Blog" onClick={() => openWindow('blog')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
+        <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} /> {/* New My Computer Icon */}
       </div>
 
       {/* Active Windows */}
@@ -90,9 +93,20 @@ const Index = () => {
           <AboutApp onClose={() => closeWindow('about')} />
         </Window>
       )}
+      {windowStates.myComputer.isOpen && (
+        <Window
+          title="My Computer"
+          onClose={() => closeWindow('myComputer')}
+          initialPosition={{ x: 250, y: 150 }}
+          zIndex={windowStates.myComputer.zIndex}
+          onFocus={() => focusWindow('myComputer')}
+        >
+          <MyComputerApp onClose={() => closeWindow('myComputer')} />
+        </Window>
+      )}
 
       {/* Made with Dyad */}
-      <div className="absolute bottom-10 right-4"> {/* Adjusted position to be above SystemTray */}
+      <div className="absolute bottom-10 right-4">
         <MadeWithDyad />
       </div>
 
