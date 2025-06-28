@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
@@ -14,10 +14,9 @@ import { WorkApp } from '@/components/WorkApp';
 import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
-import { DesktopIcon } from '@/components/DesktopIcon'; // Corrected this line
+import { DesktopIcon } from '@/components/DesktopIcon';
 import { WelcomeWindow } from '@/components/WelcomeWindow';
 import { useToast } from '@/components/ui/use-toast.tsx';
-import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
 
@@ -86,6 +85,8 @@ const Index = () => {
     });
   };
 
+  const iconBaseUrl = "https://raw.githubusercontent.com/amanchokshi/retro-icons/main/icons";
+
   return (
     <div className="min-h-screen w-full mac-desktop-bg flex flex-col relative overflow-hidden">
       {/* Menu Bar */}
@@ -93,14 +94,14 @@ const Index = () => {
 
       {/* Desktop Icons */}
       <div className="p-2 grid grid-cols-auto-fill-24 gap-x-2 gap-y-1 auto-rows-min items-start">
-        <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
-        <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
-        <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
-        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} />
-        <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} />
-        <DesktopIcon icon={Briefcase} label="My Work" onClick={() => openWindow('work')} />
-        <DesktopIcon icon={Terminal} label="Terminal" onClick={() => openWindow('terminal')} />
-        <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/documents.png`} label="My Essays" onClick={() => openWindow('essays')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/user.png`} label="About Me" onClick={() => openWindow('about')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/my_computer.png`} label="My Computer" onClick={() => openWindow('myComputer')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/game_controller.png`} label="Games" onClick={() => openWindow('gamesLauncher')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/mail.png`} label="Contact" onClick={() => openWindow('contact')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/briefcase.png`} label="My Work" onClick={() => openWindow('work')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/console.png`} label="Terminal" onClick={() => openWindow('terminal')} />
+        <DesktopIcon iconSrc={`${iconBaseUrl}/trash_empty.png`} label="Trash" onClick={handleTrashClick} />
       </div>
 
       {/* Active Windows */}
