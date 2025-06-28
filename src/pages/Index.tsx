@@ -10,14 +10,15 @@ import { SnakeGame } from '@/components/SnakeGame';
 import { SudokuGame } from '@/components/SudokuGame';
 import { SolitaireGame } from '@/components/SolitaireGame';
 import { ContactApp } from '@/components/ContactApp';
-import { WorkApp } from '@/components/WorkApp'; // Changed from ProjectsApp to WorkApp
+import { WorkApp } from '@/components/WorkApp';
+import { TerminalApp } from '@/components/TerminalApp'; // New import for TerminalApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase } from 'lucide-react'; // Changed FolderKanban to Briefcase icon
+import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react'; // Added Terminal icon
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work'; // Changed 'projects' to 'work'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal'; // Added 'terminal'
 
 interface WindowState {
   isOpen: boolean;
@@ -35,10 +36,11 @@ const Index = () => {
     sudoku: { isOpen: false, zIndex: 16 },
     solitaire: { isOpen: false, zIndex: 17 },
     contact: { isOpen: false, zIndex: 18 },
-    work: { isOpen: false, zIndex: 19 }, // Changed 'projects' to 'work'
+    work: { isOpen: false, zIndex: 19 },
+    terminal: { isOpen: false, zIndex: 20 }, // Initial z-index for Terminal
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(19); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(20); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -89,7 +91,8 @@ const Index = () => {
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
         <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} />
         <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} />
-        <DesktopIcon icon={Briefcase} label="My Work" onClick={() => openWindow('work')} /> {/* Changed to Work Icon */}
+        <DesktopIcon icon={Briefcase} label="My Work" onClick={() => openWindow('work')} />
+        <DesktopIcon icon={Terminal} label="Terminal" onClick={() => openWindow('terminal')} /> {/* New Terminal Icon */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
@@ -205,6 +208,17 @@ const Index = () => {
           onFocus={() => focusWindow('work')}
         >
           <WorkApp onClose={() => closeWindow('work')} />
+        </Window>
+      )}
+      {windowStates.terminal.isOpen && (
+        <Window
+          title="Terminal"
+          onClose={() => closeWindow('terminal')}
+          initialPosition={{ x: 700, y: 550 }}
+          zIndex={windowStates.terminal.zIndex}
+          onFocus={() => focusWindow('terminal')}
+        >
+          <TerminalApp onClose={() => closeWindow('terminal')} />
         </Window>
       )}
 
