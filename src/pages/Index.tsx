@@ -15,11 +15,13 @@ import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { WelcomeWindow } from '@/components/WelcomeWindow'; // New import
+import { WelcomeWindow } from '@/components/WelcomeWindow';
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
-import { toast } from 'sonner';
+import { Toaster } from "@/components/ui/toaster"; // Radix UI Toaster
+import { Toaster as Sonner } from "@/components/ui/sonner"; // Sonner Toaster
+import { toast } from 'sonner'; // Keep sonner toast utility
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome'; // Added 'welcome'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
 
 interface WindowState {
   isOpen: boolean;
@@ -39,10 +41,10 @@ const Index = () => {
     contact: { isOpen: false, zIndex: 18 },
     work: { isOpen: false, zIndex: 19 },
     terminal: { isOpen: false, zIndex: 20 },
-    welcome: { isOpen: true, zIndex: 21 }, // Welcome window starts open
+    welcome: { isOpen: true, zIndex: 21 },
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(21); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(21);
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -87,7 +89,7 @@ const Index = () => {
       <MenuBar onOpenAbout={() => openWindow('about')} />
 
       {/* Desktop Icons */}
-      <div className="p-2 grid grid-cols-auto-fill-24 gap-x-2 gap-y-1 auto-rows-min items-start"> {/* Adjusted padding and grid gaps */}
+      <div className="p-2 grid grid-cols-auto-fill-24 gap-x-2 gap-y-1 auto-rows-min items-start">
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
@@ -242,6 +244,10 @@ const Index = () => {
 
       {/* System Tray */}
       <SystemTray />
+
+      {/* Toasters for notifications */}
+      <Toaster />
+      <Sonner />
     </div>
   );
 };
