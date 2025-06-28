@@ -25,13 +25,13 @@ const WelcomeWindow: React.FC<WelcomeWindowProps> = ({ onClose }) => {
               Welcome to my digital realm, designed with a nostalgic nod to classic operating systems.
               Here, you can explore my projects, thoughts, and connect with me in a unique, interactive environment.
             </p>
-            <p className="text-xs mb-2"> {/* Adjusted font size and margin */}
+            <div className="text-xs mb-2"> {/* Changed <p> to <div> */}
               I'm Andy Jung, a recent grad (Class of 2024) from Boston College. I studied
               <Badge variant="secondary" className="ml-0.5 mr-0.5 bg-mac-medium-gray text-mac-black text-[0.65rem] px-1 py-0.5">Finance</Badge> {/* Adjusted padding and font size */}
               <Badge variant="secondary" className="mr-0.5 bg-mac-medium-gray text-mac-black text-[0.65rem] px-1 py-0.5">Computer Science</Badge> {/* Adjusted padding and font size */}
               and
               <Badge variant="secondary" className="ml-0.5 bg-mac-medium-gray text-mac-black text-[0.65rem] px-1 py-0.5">Information Systems</Badge>. {/* Adjusted padding and font size */}
-            </p>
+            </div>
             <p className="text-xs"> {/* Adjusted font size */}
               I enjoy building things and listening to music. Feel free to click around and discover more!
             </p>

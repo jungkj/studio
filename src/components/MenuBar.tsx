@@ -44,7 +44,9 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpenAbout }) => {
       <div className="flex items-center space-x-2 h-full"> {/* Adjusted space-x */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Apple size={14} className="text-mac-black cursor-pointer hover:bg-mac-medium-gray/30 rounded-sm p-0.5" /> {/* Smaller icon */}
+            <button className="cursor-pointer hover:bg-mac-medium-gray/30 rounded-sm p-0.5">
+              <Apple size={14} className="text-mac-black" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mac-border-outset bg-mac-light-gray text-mac-black text-xs">
             <DropdownMenuItem onClick={onOpenAbout} className="cursor-pointer hover:bg-mac-medium-gray">
