@@ -125,10 +125,16 @@
 /* macOS desktop background pattern */
 .mac-desktop-bg {
   background-color: hsl(var(--mac-medium-gray)); /* Base gray */
-  /* Using a base64 encoded SVG for a simple 2x2 pixel dither pattern */
-  background-image: url("data:image/svg+xml,%3Csvg width='2' height='2' viewBox='0 0 2 2' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='0' width='1' height='1' fill='%23808080'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%23808080'/%3E%3C/svg%3E");
-  background-size: 2px 2px;
-  image-rendering: pixelated; /* Ensures the pattern stays sharp */
+  /*
+    To use an old macOS wallpaper, replace the `url()` below with a base64 encoded image.
+    You can find a suitable image online (e.g., "mac os 9 wallpaper") and convert it to base64.
+    Example: background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...");
+  */
+  background-image: url("data:image/svg+xml,%3Csvg width='2' height='2' viewBox='0 0 2 2' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='0' width='1' height='1' fill='%23808080'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%23808080'/%3E%3C/svg%3E"); /* Default dither pattern */
+  background-size: cover; /* Cover the entire background */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  image-rendering: auto; /* Allow smooth rendering for wallpaper */
 }
 
 /* Remove old custom styles */
