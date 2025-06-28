@@ -14,10 +14,10 @@ import { WorkApp } from '@/components/WorkApp';
 import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
-import { DesktopIcon } from '@/components/DesktopIcon';
+import { DesktopIcon } => '@/components/DesktopIcon';
 import { WelcomeWindow } from '@/components/WelcomeWindow';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
-import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { useToast } from '@/components/ui/use-toast'; // Corrected import path for useToast
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
