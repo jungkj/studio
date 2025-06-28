@@ -19,6 +19,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        // Keeping pixel font for specific elements if needed, but not as default body font
         pixel: ['"Press Start 2P"', 'cursive'],
       },
       colors: {
@@ -65,14 +66,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Pokemon Emerald inspired colors
-        'emerald-dark-green': '#386040',
-        'emerald-light-green': '#68A070',
-        'emerald-dark-blue': '#284060',
-        'emerald-light-blue': '#5078A0',
-        'emerald-white': '#F8F8F8',
-        'emerald-black': '#202020',
-        'emerald-border': '#181818',
+        // New macOS-inspired grayscale colors
+        'mac-light-gray': 'hsl(var(--mac-light-gray))',
+        'mac-medium-gray': 'hsl(var(--mac-medium-gray))',
+        'mac-dark-gray': 'hsl(var(--mac-dark-gray))',
+        'mac-black': 'hsl(var(--mac-black))',
+        'mac-white': 'hsl(var(--mac-white))',
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -4,56 +4,59 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Default (light) theme colors - adjusted for macOS look */
+    --background: 0 0% 100%; /* White for content areas */
+    --foreground: 0 0% 0%; /* Black for text */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 220 0% 50%; /* Dark gray for primary elements */
+    --primary-foreground: 0 0% 100%; /* White text on dark gray */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 0% 75%; /* Medium gray for secondary elements */
+    --secondary-foreground: 0 0% 0%; /* Black text on medium gray */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 0% 86%; /* Light gray for muted elements */
+    --muted-foreground: 0 0% 0%; /* Black text on light gray */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 0% 75%; /* Medium gray for accent */
+    --accent-foreground: 0 0% 0%; /* Black text on accent */
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84.2% 60.2%; /* Keep red for destructive actions */
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 0% 50%; /* Dark gray for borders */
+    --input: 220 0% 86%; /* Light gray for input fields */
+    --ring: 220 0% 50%; /* Dark gray for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0rem; /* Sharp corners for retro look */
 
+    /* macOS specific grayscale colors */
+    --mac-light-gray: 220 0% 86%; /* #DCDCDC */
+    --mac-medium-gray: 220 0% 75%; /* #BFBFBF */
+    --mac-dark-gray: 220 0% 50%; /* #808080 */
+    --mac-black: 0 0% 0%; /* #000000 */
+    --mac-white: 0 0% 100%; /* #FFFFFF */
+
+    /* Sidebar colors (can be adjusted later if needed for macOS theme) */
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark theme colors - adjusted for macOS look (can be simplified if only light theme is desired) */
+    --background: 222.2 84% 4.9%; /* Dark background */
+    --foreground: 210 40% 98%; /* Light text */
 
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -96,24 +99,42 @@
   }
 
   body {
-    @apply bg-background text-foreground font-pixel; /* Apply pixel font here */
+    /* Remove pixel font from body, use system sans-serif */
+    @apply bg-background text-foreground font-sans;
+    /* Ensure smooth font rendering for system-like text */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Custom pixelated border styles */
-.pixel-border {
+/* Custom macOS-style 3D border effects */
+.mac-border-outset {
   border-style: solid;
-  border-width: 2px; /* Adjust as needed for pixel effect */
-  border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6"><rect x="0" y="0" width="2" height="2" fill="%23181818"/><rect x="2" y="0" width="2" height="2" fill="%23181818"/><rect x="4" y="0" width="2" height="2" fill="%23181818"/><rect x="0" y="2" width="2" height="2" fill="%23181818"/><rect x="4" y="2" width="2" height="2" fill="%23181818"/><rect x="0" y="4" width="2" height="2" fill="%23181818"/><rect x="2" y="4" width="2" height="2" fill="%23181818"/><rect x="4" y="4" width="2" height="2" fill="%23181818"/></svg>') 2 stretch;
-  image-rendering: pixelated;
-}
-
-.pixel-border-inset {
-  border-style: inset;
   border-width: 2px;
-  border-color: #888 #eee #eee #888; /* Simulates old UI inset */
+  border-color: hsl(var(--mac-white)) hsl(var(--mac-dark-gray)) hsl(var(--mac-dark-gray)) hsl(var(--mac-white));
+  box-shadow: 1px 1px 0px 0px hsl(var(--mac-black)); /* Simple shadow for depth */
 }
 
-.pixel-shadow {
-  box-shadow: 2px 2px 0px 0px var(--emerald-black); /* Simple pixel shadow */
+.mac-border-inset {
+  border-style: solid;
+  border-width: 2px;
+  border-color: hsl(var(--mac-dark-gray)) hsl(var(--mac-white)) hsl(var(--mac-white)) hsl(var(--mac-dark-gray));
+  box-shadow: inset 1px 1px 0px 0px hsl(var(--mac-black)); /* Simple inset shadow */
+}
+
+/* macOS desktop background pattern */
+.mac-desktop-bg {
+  background-color: hsl(var(--mac-medium-gray)); /* Base gray */
+  /* Using a base64 encoded SVG for a simple 2x2 pixel dither pattern */
+  background-image: url("data:image/svg+xml,%3Csvg width='2' height='2' viewBox='0 0 2 2' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23BFBFBF'/%3E%3Crect x='1' y='0' width='1' height='1' fill='%23808080'/%3E%3Crect x='0' y='1' width='1' height='1' fill='%23808080'/%3E%3C/svg%3E");
+  background-size: 2px 2px;
+  image-rendering: pixelated; /* Ensures the pattern stays sharp */
+}
+
+/* Remove old custom styles */
+.pixel-border, .pixel-border-inset, .pixel-shadow {
+  /* These classes are no longer needed and will be replaced by mac-border-outset/inset */
+  border-style: none !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
 }
