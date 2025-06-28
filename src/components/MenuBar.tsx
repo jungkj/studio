@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Apple } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"; // Import DropdownMenu components
 
-const MenuBar: React.FC = () => {
+interface MenuBarProps {
+  onOpenAbout: () => void;
+}
+
+const MenuBar: React.FC<MenuBarProps> = ({ onOpenAbout }) => {
   const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
@@ -31,7 +42,27 @@ const MenuBar: React.FC = () => {
     )}>
       {/* Left side: Apple logo and menu items */}
       <div className="flex items-center space-x-4 h-full">
-        <Apple size={16} className="text-mac-black cursor-pointer" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Apple size={16} className="text-mac-black cursor-pointer hover:bg-mac-medium-gray/30 rounded-sm p-0.5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="mac-border-outset bg-mac-light-gray text-mac-black text-xs">
+            <DropdownMenuItem onClick={onOpenAbout} className="cursor-pointer hover:bg-mac-medium-gray">
+              About This Mac
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-mac-dark-gray" />
+            <DropdownMenuItem className="cursor-not-allowed text-mac-dark-gray">
+              System Settings... (Coming Soon)
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-not-allowed text-mac-dark-gray">
+              Restart... (Coming Soon)
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-not-allowed text-mac-dark-gray">
+              Shut Down... (Coming Soon)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {/* Other static menu items */}
         <span className="font-bold cursor-pointer hover:underline">File</span>
         <span className="font-bold cursor-pointer hover:underline">Edit</span>
         <span className="font-bold cursor-pointer hover:underline">View</span>

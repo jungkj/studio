@@ -82,10 +82,10 @@ const Index = () => {
   return (
     <div className="min-h-screen w-full mac-desktop-bg flex flex-col relative overflow-hidden">
       {/* Menu Bar */}
-      <MenuBar />
+      <MenuBar onOpenAbout={() => openWindow('about')} /> {/* Pass openWindow for 'about' */}
 
       {/* Desktop Icons */}
-      <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 auto-rows-min items-start"> {/* Changed to a 2-column grid */}
+      <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 auto-rows-min items-start">
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
