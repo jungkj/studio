@@ -14,18 +14,21 @@ export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <> {/* Use a React.Fragment to allow multiple children */}
+    <>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
+            {/* Wrap all content in a single div to satisfy Radix UI's single child requirement for Toast.Root */}
+            <div className="flex items-center justify-between w-full">
+              <div className="grid gap-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </div>
+              {action}
+              <ToastClose />
             </div>
-            {action}
-            <ToastClose />
           </Toast>
         )
       })}
