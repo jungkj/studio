@@ -16,8 +16,7 @@ import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon'; // Corrected this line
 import { WelcomeWindow } from '@/components/WelcomeWindow';
-import { Toaster } from '@/components/ui/toaster';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.tsx';
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
@@ -248,9 +247,6 @@ const Index = () => {
 
       {/* System Tray */}
       <SystemTray />
-
-      {/* Toaster for notifications */}
-      <Toaster />
     </div>
   );
 };

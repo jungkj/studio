@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { type ToastActionElement, type ToastProps } from "@/components/ui/toast"
+import { Toaster } from "@/components/ui/toaster"
 
 // --- Constants and Types ---
 
@@ -130,6 +131,7 @@ function ToasterContextProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
+      <Toaster />
     </ToastContext.Provider>
   )
 }
