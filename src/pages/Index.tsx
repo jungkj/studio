@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
@@ -15,10 +15,11 @@ import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
+import { WelcomeWindow } from '@/components/WelcomeWindow'; // New import
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal';
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome'; // Added 'welcome'
 
 interface WindowState {
   isOpen: boolean;
@@ -38,9 +39,10 @@ const Index = () => {
     contact: { isOpen: false, zIndex: 18 },
     work: { isOpen: false, zIndex: 19 },
     terminal: { isOpen: false, zIndex: 20 },
+    welcome: { isOpen: true, zIndex: 21 }, // Welcome window starts open
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(20);
+  const [maxZIndex, setMaxZIndex] = useState(21); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -82,7 +84,7 @@ const Index = () => {
   return (
     <div className="min-h-screen w-full mac-desktop-bg flex flex-col relative overflow-hidden">
       {/* Menu Bar */}
-      <MenuBar onOpenAbout={() => openWindow('about')} /> {/* Pass openWindow for 'about' */}
+      <MenuBar onOpenAbout={() => openWindow('about')} />
 
       {/* Desktop Icons */}
       <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 auto-rows-min items-start">
@@ -97,6 +99,17 @@ const Index = () => {
       </div>
 
       {/* Active Windows */}
+      {windowStates.welcome.isOpen && (
+        <Window
+          title="Welcome"
+          onClose={() => closeWindow('welcome')}
+          initialPosition={{ x: 200, y: 150 }}
+          zIndex={windowStates.welcome.zIndex}
+          onFocus={() => focusWindow('welcome')}
+        >
+          <WelcomeWindow onClose={() => closeWindow('welcome')} />
+        </Window>
+      )}
       {windowStates.essays.isOpen && (
         <Window
           title="My Essays"
