@@ -67,9 +67,6 @@ const reducer = (state: State, action: Action): State => {
 
     case actionTypes.DISMISS_TOAST: {
       const { toastId } = action
-
-      // ! Side effects ! - This means all toasts will be dismissed
-      // Make sure you handle this in a sensible way.
       if (toastId) {
         return {
           ...state,
@@ -94,7 +91,7 @@ const reducer = (state: State, action: Action): State => {
 
 const ToastContext = React.createContext<
   | {
-      toast: ({ ...props }: ToasterToast) => {
+      toast: (props: Omit<ToasterToast, "id">) => {
         id: string
         dismiss: () => void
         update: (props: Partial<ToasterToast>) => void
@@ -104,10 +101,6 @@ const ToastContext = React.createContext<
     }
   | undefined
 >(undefined)
-
-type ToastProviderProps = {
-  children: React.ReactNode
-}
 
 function ToastProvider({ children }: ToastProviderProps) {
   const [state, dispatch] = React.useReducer(reducer, { toasts: [] })
@@ -124,8 +117,8 @@ function ToastProvider({ children }: ToastProviderProps) {
     }
   }, [state.toasts])
 
-  const addToast = React.useCallback(
-    ({ ...props }: ToasterToast) => {
+  const toast = React.useCallback(
+    (props: Omit<ToasterToast, "id">) => {
       const id = genId()
 
       const update = (props: Partial<ToasterToast>) =>
@@ -153,16 +146,20 @@ function ToastProvider({ children }: ToastProviderProps) {
         update,
       }
     },
-    [dispatch]
+    []
   )
+
+  const dismiss = React.useCallback((toastId?: string) => {
+    dispatch({ type: actionTypes.DISMISS_TOAST, toastId })
+  }, [])
 
   const contextValue = React.useMemo(
     () => ({
-      toast: addToast,
-      dismiss: (toastId?: string) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
+      toast,
+      dismiss,
       toasts: state.toasts,
     }),
-    [addToast, state.toasts]
+    [toast, dismiss, state.toasts]
   )
 
   return (
