@@ -17,9 +17,6 @@ import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
 import { WelcomeWindow } from '@/components/WelcomeWindow';
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
-import { Toaster } from "@/components/ui/toaster"; // Radix UI Toaster
-import { Toaster as Sonner } from "@/components/ui/sonner"; // Sonner Toaster
-import { toast } from 'sonner'; // Keep sonner toast utility
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
 
@@ -80,7 +77,8 @@ const Index = () => {
   };
 
   const handleTrashClick = () => {
-    toast.info("Trash is empty. Drag items here to delete them!");
+    // Removed toast.info call as toast system is being removed
+    console.log("Trash is empty. Drag items here to delete them!");
   };
 
   return (
@@ -244,10 +242,6 @@ const Index = () => {
 
       {/* System Tray */}
       <SystemTray />
-
-      {/* Toasters for notifications */}
-      <Toaster />
-      <Sonner />
     </div>
   );
 };
