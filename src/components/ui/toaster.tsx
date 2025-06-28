@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react" // Import React for Fragment
 import {
   Toast,
   ToastClose,
@@ -8,18 +9,20 @@ import {
   ToastViewport,
 } from "@radix-ui/react-toast"
 import { useToast } from "@/hooks/use-toast"
-import React from "react" // Import React for Fragment
+import { cn } from "@/lib/utils"
 
 export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            {/* Wrap all content in a single div to satisfy Radix UI's single child requirement for Toast.Root */}
-            <div className="flex items-center justify-between w-full">
+    <ToastViewport className={cn(
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+    )}>
+      {/* Ensure ToastViewport receives a single child by wrapping mapped toasts in a Fragment */}
+      <React.Fragment>
+        {toasts.map(function ({ id, title, description, action, ...props }) {
+          return (
+            <Toast key={id} {...props}>
               <div className="grid gap-1">
                 {title && <ToastTitle>{title}</ToastTitle>}
                 {description && (
@@ -28,11 +31,10 @@ export function Toaster() {
               </div>
               {action}
               <ToastClose />
-            </div>
-          </Toast>
-        )
-      })}
-      <ToastViewport />
-    </>
+            </Toast>
+          )
+        })}
+      </React.Fragment>
+    </ToastViewport>
   )
 }
