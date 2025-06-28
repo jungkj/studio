@@ -9,14 +9,15 @@ import { TicTacToe } from '@/components/TicTacToe';
 import { SnakeGame } from '@/components/SnakeGame';
 import { SudokuGame } from '@/components/SudokuGame';
 import { SolitaireGame } from '@/components/SolitaireGame';
-import { ContactApp } from '@/components/ContactApp'; // New import for ContactApp
+import { ContactApp } from '@/components/ContactApp';
+import { ProjectsApp } from '@/components/ProjectsApp'; // New import for ProjectsApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, Gamepad2, Mail } from 'lucide-react'; // Added Mail icon
+import { FileText, User, Monitor, Trash2, Gamepad2, Mail, FolderKanban } from 'lucide-react'; // Added FolderKanban icon
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact'; // Added 'contact'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'projects'; // Added 'projects'
 
 interface WindowState {
   isOpen: boolean;
@@ -33,10 +34,11 @@ const Index = () => {
     snake: { isOpen: false, zIndex: 15 },
     sudoku: { isOpen: false, zIndex: 16 },
     solitaire: { isOpen: false, zIndex: 17 },
-    contact: { isOpen: false, zIndex: 18 }, // Initial z-index for Contact
+    contact: { isOpen: false, zIndex: 18 },
+    projects: { isOpen: false, zIndex: 19 }, // Initial z-index for Projects
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(18); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(19); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -86,7 +88,8 @@ const Index = () => {
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
         <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} />
-        <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} /> {/* New Contact Icon */}
+        <DesktopIcon icon={Mail} label="Contact" onClick={() => openWindow('contact')} />
+        <DesktopIcon icon={FolderKanban} label="Projects" onClick={() => openWindow('projects')} /> {/* New Projects Icon */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
@@ -191,6 +194,17 @@ const Index = () => {
           onFocus={() => focusWindow('contact')}
         >
           <ContactApp onClose={() => closeWindow('contact')} />
+        </Window>
+      )}
+      {windowStates.projects.isOpen && (
+        <Window
+          title="My Projects"
+          onClose={() => closeWindow('projects')}
+          initialPosition={{ x: 650, y: 500 }}
+          zIndex={windowStates.projects.zIndex}
+          onFocus={() => focusWindow('projects')}
+        >
+          <ProjectsApp onClose={() => closeWindow('projects')} />
         </Window>
       )}
 
