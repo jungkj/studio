@@ -13,13 +13,13 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({ icon: Icon, label, onClick, c
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center p-2 w-20 h-20", // Fixed size for consistent icon grid
-        "text-mac-black text-xs font-sans",
+        "flex flex-col items-center justify-center p-3 w-24 h-24", // Adjusted size and padding
+        "text-mac-black text-xs font-sans", // Font is now globally pixelated
         "hover:bg-mac-medium-gray/30 active:bg-mac-medium-gray/50 rounded-sm", // Subtle hover/active state
         className
       )}
     >
-      <Icon size={32} className="mb-1" />
+      <Icon size={40} className="mb-1" /> {/* Adjusted icon size */}
       <span className="text-center leading-tight">{label}</span>
     </button>
   );

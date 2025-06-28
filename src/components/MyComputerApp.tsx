@@ -16,26 +16,26 @@ const MyComputerApp: React.FC<MyComputerAppProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="p-2 font-sans text-mac-black flex flex-col h-full">
-      <h2 className="text-lg font-bold mb-4">My Computer</h2>
-      <div className="flex-grow overflow-auto mac-border-inset bg-mac-light-gray p-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="p-1 font-sans text-mac-black flex flex-col h-full"> {/* Adjusted padding */}
+      <h2 className="text-base mb-2">My Computer</h2> {/* Adjusted font size, removed bold */}
+      <div className="flex-grow overflow-auto mac-border-inset bg-mac-light-gray p-2"> {/* Adjusted padding */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"> {/* Adjusted gap and columns */}
           {items.map((item, index) => (
             <div
               key={index}
               className={cn(
-                "flex flex-col items-center p-2 cursor-pointer",
+                "flex flex-col items-center p-1 cursor-pointer", // Adjusted padding
                 "hover:bg-mac-medium-gray/30 active:bg-mac-medium-gray/50 rounded-sm"
               )}
             >
-              <item.icon size={32} className="mb-1" />
-              <span className="text-center text-sm font-bold leading-tight">{item.label}</span>
-              <span className="text-center text-xs text-mac-dark-gray">{item.description}</span>
+              <item.icon size={28} className="mb-0.5" /> {/* Adjusted icon size and margin */}
+              <span className="text-xs leading-tight">{item.label}</span> {/* Adjusted font size, removed bold */}
+              <span className="text-[0.65rem] text-center text-mac-dark-gray">{item.description}</span> {/* Smaller font size */}
             </div>
           ))}
         </div>
       </div>
-      <div className="mt-4 text-right">
+      <div className="mt-2 text-right"> {/* Adjusted margin-top */}
         <PixelButton onClick={onClose} variant="default">Close</PixelButton>
       </div>
     </div>

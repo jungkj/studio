@@ -19,7 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Keeping pixel font for specific elements if needed, but not as default body font
+        // Set 'Press Start 2P' as the default sans-serif font
+        sans: ['"Press Start 2P"', 'cursive'],
+        // Keep pixel for explicit use if needed, though 'sans' will now be pixelated
         pixel: ['"Press Start 2P"', 'cursive'],
       },
       colors: {

@@ -82,11 +82,11 @@ This is a simulated terminal for a personal website.`;
   };
 
   return (
-    <div className="p-2 font-mono text-mac-white flex flex-col h-full bg-mac-black mac-border-inset">
-      <h2 className="text-lg font-bold mb-2 text-mac-white">Terminal</h2>
+    <div className="p-1 font-mono text-mac-white flex flex-col h-full bg-mac-black mac-border-inset"> {/* Adjusted padding */}
+      <h2 className="text-base mb-1 text-mac-white">Terminal</h2> {/* Adjusted font size, removed bold, adjusted margin */}
       <div
         ref={terminalRef}
-        className="flex-grow overflow-y-auto text-xs p-2 bg-black text-green-400" // Classic terminal look
+        className="flex-grow overflow-y-auto text-xs p-1 bg-black text-green-400" // Classic terminal look, adjusted padding
         style={{ scrollbarWidth: 'none' }} // Hide scrollbar for cleaner look
       >
         {history.map((line, index) => (
@@ -95,8 +95,8 @@ This is a simulated terminal for a personal website.`;
           </pre>
         ))}
       </div>
-      <div className="mt-2 flex items-center">
-        <span className="text-blue-300 text-xs mr-1">{prompt}</span>
+      <div className="mt-1 flex items-center"> {/* Adjusted margin-top */}
+        <span className="text-blue-300 text-xs mr-0.5">{prompt}</span> {/* Adjusted margin */}
         <input
           ref={inputRef}
           type="text"
@@ -107,7 +107,7 @@ This is a simulated terminal for a personal website.`;
           autoFocus
         />
       </div>
-      <div className="mt-4 text-right">
+      <div className="mt-2 text-right"> {/* Adjusted margin-top */}
         <PixelButton onClick={onClose} variant="danger">Close Terminal</PixelButton>
       </div>
     </div>

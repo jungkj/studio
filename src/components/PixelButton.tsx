@@ -8,7 +8,7 @@ interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
 const PixelButton = React.forwardRef<HTMLButtonElement, PixelButtonProps>(
   ({ className, variant = 'default', children, ...props }, ref) => {
     // Base classes for all buttons, applying the macOS outset border
-    const baseClasses = "px-4 py-2 text-sm cursor-pointer mac-border-outset active:mac-border-inset";
+    const baseClasses = "px-3 py-1 text-xs cursor-pointer mac-border-outset active:mac-border-inset"; // Adjusted padding and text size
 
     // Variant-specific classes using the new macOS grayscale palette
     const variantClasses = {

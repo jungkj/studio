@@ -33,9 +33,9 @@ const TicTacToe: React.FC = () => {
   const renderSquare = (i: number) => (
     <button
       className={cn(
-        "w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20", // Responsive sizing
+        "w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16", // Responsive sizing, adjusted smaller
         "bg-mac-light-gray mac-border-outset active:mac-border-inset",
-        "flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold",
+        "flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-sans", // Adjusted font size, removed bold
         "text-mac-black cursor-pointer"
       )}
       onClick={() => handleClick(i)}
@@ -50,10 +50,10 @@ const TicTacToe: React.FC = () => {
   };
 
   return (
-    <div className="p-2 font-sans text-mac-black flex flex-col items-center">
-      <h3 className="text-lg font-bold mb-2">Tic-Tac-Toe</h3>
-      <div className="mb-4 text-sm">{status}</div>
-      <div className="grid grid-cols-3 grid-rows-3 gap-1 mb-4">
+    <div className="p-1 font-sans text-mac-black flex flex-col items-center"> {/* Adjusted padding */}
+      <h3 className="text-base mb-1">Tic-Tac-Toe</h3> {/* Adjusted font size, removed bold */}
+      <div className="mb-2 text-xs">{status}</div> {/* Adjusted margin and font size */}
+      <div className="grid grid-cols-3 grid-rows-3 gap-0.5 mb-2"> {/* Adjusted gap and margin */}
         {Array.from({ length: 9 }).map((_, i) => renderSquare(i))}
       </div>
       <PixelButton onClick={resetGame} variant="default">Reset Game</PixelButton>

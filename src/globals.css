@@ -99,11 +99,11 @@
   }
 
   body {
-    /* Remove pixel font from body, use system sans-serif */
+    /* Apply pixel font to body */
     @apply bg-background text-foreground font-sans;
-    /* Ensure smooth font rendering for system-like text */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    /* Remove smooth font rendering for pixelated look */
+    -webkit-font-smoothing: unset;
+    -moz-osx-font-smoothing: unset;
   }
 }
 
@@ -125,11 +125,13 @@
 /* macOS desktop background pattern */
 .mac-desktop-bg {
   background-color: hsl(var(--mac-medium-gray)); /* Base gray */
-  /* Removed background-image to revert to plain gray */
-  background-size: cover; /* Cover the entire background */
-  background-position: center; /* Center the image */
-  background-repeat: no-repeat; /* Do not repeat the image */
-  image-rendering: auto; /* Allow smooth rendering for wallpaper */
+  /* Pixelated pattern */
+  background-image:
+    linear-gradient(45deg, hsl(var(--mac-dark-gray)) 25%, transparent 25%, transparent 75%, hsl(var(--mac-dark-gray)) 75%, hsl(var(--mac-dark-gray))),
+    linear-gradient(45deg, hsl(var(--mac-dark-gray)) 25%, transparent 25%, transparent 75%, hsl(var(--mac-dark-gray)) 75%, hsl(var(--mac-dark-gray)));
+  background-size: 8px 8px; /* Size of the pixel pattern */
+  background-position: 0 0, 4px 4px; /* Offset for checkerboard effect */
+  image-rendering: pixelated; /* Ensure pixelated rendering */
 }
 
 /* Remove old custom styles */

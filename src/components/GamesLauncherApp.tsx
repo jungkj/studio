@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelButton } from './PixelButton';
-import { TicTacToe } from './TicTacToe'; // Keep TicTacToe as an example game
+// import { TicTacToe } from './TicTacToe'; // Keep TicTacToe as an example game - no need to import here
 
 interface GamesLauncherAppProps {
   onClose: () => void;
@@ -9,9 +9,9 @@ interface GamesLauncherAppProps {
 
 const GamesLauncherApp: React.FC<GamesLauncherAppProps> = ({ onClose, onLaunchGame }) => {
   return (
-    <div className="p-2 font-sans text-mac-black flex flex-col h-full">
-      <h2 className="text-lg font-bold mb-4">Games</h2>
-      <div className="flex-grow mac-border-inset bg-mac-light-gray p-3 flex flex-col space-y-2">
+    <div className="p-1 font-sans text-mac-black flex flex-col h-full"> {/* Adjusted padding */}
+      <h2 className="text-base mb-2">Games</h2> {/* Adjusted font size, removed bold */}
+      <div className="flex-grow mac-border-inset bg-mac-light-gray p-2 flex flex-col space-y-1"> {/* Adjusted padding and space-y */}
         <PixelButton onClick={() => { onLaunchGame('ticTacToe'); onClose(); }} variant="default" className="w-full">
           Tic-Tac-Toe
         </PixelButton>
@@ -25,7 +25,7 @@ const GamesLauncherApp: React.FC<GamesLauncherAppProps> = ({ onClose, onLaunchGa
           Solitaire
         </PixelButton>
       </div>
-      <div className="mt-4 text-right">
+      <div className="mt-2 text-right"> {/* Adjusted margin-top */}
         <PixelButton onClick={onClose} variant="default">Close Games Launcher</PixelButton>
       </div>
     </div>

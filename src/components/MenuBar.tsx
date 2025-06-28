@@ -36,15 +36,15 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpenAbout }) => {
 
   return (
     <div className={cn(
-      "w-full h-6 bg-mac-light-gray mac-border-inset", // Light gray background with inset border for depth
-      "flex items-center justify-between px-2 text-mac-black text-xs font-sans",
+      "w-full h-5 bg-mac-light-gray mac-border-inset", // Light gray background with inset border for depth, adjusted height
+      "flex items-center justify-between px-1 text-mac-black text-xs font-sans", // Adjusted padding
       "select-none" // Prevent text selection
     )}>
       {/* Left side: Apple logo and menu items */}
-      <div className="flex items-center space-x-4 h-full">
+      <div className="flex items-center space-x-2 h-full"> {/* Adjusted space-x */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Apple size={16} className="text-mac-black cursor-pointer hover:bg-mac-medium-gray/30 rounded-sm p-0.5" />
+            <Apple size={14} className="text-mac-black cursor-pointer hover:bg-mac-medium-gray/30 rounded-sm p-0.5" /> {/* Smaller icon */}
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mac-border-outset bg-mac-light-gray text-mac-black text-xs">
             <DropdownMenuItem onClick={onOpenAbout} className="cursor-pointer hover:bg-mac-medium-gray">
@@ -63,15 +63,15 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpenAbout }) => {
           </DropdownMenuContent>
         </DropdownMenu>
         {/* Other static menu items */}
-        <span className="font-bold cursor-pointer hover:underline">File</span>
-        <span className="font-bold cursor-pointer hover:underline">Edit</span>
-        <span className="font-bold cursor-pointer hover:underline">View</span>
-        <span className="font-bold cursor-pointer hover:underline">Help</span>
+        <span className="cursor-pointer hover:underline">File</span> {/* Removed font-bold */}
+        <span className="cursor-pointer hover:underline">Edit</span> {/* Removed font-bold */}
+        <span className="cursor-pointer hover:underline">View</span> {/* Removed font-bold */}
+        <span className="cursor-pointer hover:underline">Help</span> {/* Removed font-bold */}
       </div>
 
       {/* Right side: Time */}
-      <div className="flex items-center space-x-2 h-full">
-        <span className="font-bold">{currentTime}</span>
+      <div className="flex items-center space-x-1 h-full"> {/* Adjusted space-x */}
+        <span className="">{currentTime}</span> {/* Removed font-bold */}
       </div>
     </div>
   );

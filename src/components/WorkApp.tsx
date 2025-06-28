@@ -36,10 +36,10 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="p-2 font-sans text-mac-black flex flex-col h-full">
-      <h2 className="text-lg font-bold mb-4">My Work</h2>
-      <div className="flex-grow overflow-auto mac-border-inset bg-mac-light-gray p-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="p-1 font-sans text-mac-black flex flex-col h-full"> {/* Adjusted padding */}
+      <h2 className="text-base mb-2">My Work</h2> {/* Adjusted font size, removed bold */}
+      <div className="flex-grow overflow-auto mac-border-inset bg-mac-light-gray p-2"> {/* Adjusted padding */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2"> {/* Adjusted gap */}
           {projects.map((project, index) => (
             <a
               key={index}
@@ -47,21 +47,21 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "flex flex-col p-3 cursor-pointer mac-border-outset bg-mac-white", // Card styling
+                "flex flex-col p-2 cursor-pointer mac-border-outset bg-mac-white", // Card styling, adjusted padding
                 "hover:bg-mac-medium-gray/30 active:bg-mac-medium-gray/50 rounded-sm",
                 "transition-colors duration-150"
               )}
             >
-              <div className="flex items-center mb-2">
-                <project.icon size={20} className="mr-2 text-mac-dark-gray" />
-                <h3 className="font-bold text-md leading-tight">{project.title}</h3>
-                <ExternalLink size={16} className="ml-auto text-mac-dark-gray" />
+              <div className="flex items-center mb-1"> {/* Adjusted margin */}
+                <project.icon size={16} className="mr-1 text-mac-dark-gray" /> {/* Adjusted icon size and margin */}
+                <h3 className="text-sm leading-tight">{project.title}</h3> {/* Adjusted font size, removed bold */}
+                <ExternalLink size={14} className="ml-auto text-mac-dark-gray" /> {/* Adjusted icon size */}
               </div>
-              <img src={project.screenshot} alt={project.title} className="w-full h-auto mb-2 object-cover mac-border-inset" />
-              <p className="text-sm text-mac-black mb-2">{project.description}</p>
-              <div className="flex flex-wrap gap-1">
+              <img src={project.screenshot} alt={project.title} className="w-full h-auto mb-1 object-cover mac-border-inset" /> {/* Adjusted margin */}
+              <p className="text-xs text-mac-black mb-1">{project.description}</p> {/* Adjusted font size and margin */}
+              <div className="flex flex-wrap gap-0.5"> {/* Adjusted gap */}
                 {project.technologies.map((tech, techIndex) => (
-                  <span key={techIndex} className="bg-mac-medium-gray text-mac-black text-xs px-2 py-1 rounded-sm">
+                  <span key={techIndex} className="bg-mac-medium-gray text-mac-black text-[0.65rem] px-1 py-0.5 rounded-sm"> {/* Adjusted font size and padding */}
                     {tech}
                   </span>
                 ))}
@@ -69,11 +69,11 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
             </a>
           ))}
         </div>
-        <p className="text-xs text-mac-dark-gray mt-4">
+        <p className="text-[0.65rem] text-mac-dark-gray mt-2"> {/* Smaller font size, adjusted margin */}
           (Note: Click on project cards to view more details or external links.)
         </p>
       </div>
-      <div className="mt-4 text-right">
+      <div className="mt-2 text-right"> {/* Adjusted margin-top */}
         <PixelButton onClick={onClose} variant="default">Close Work</PixelButton>
       </div>
     </div>

@@ -87,7 +87,7 @@ const Index = () => {
       <MenuBar onOpenAbout={() => openWindow('about')} />
 
       {/* Desktop Icons */}
-      <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-2 auto-rows-min items-start">
+      <div className="p-2 grid grid-cols-auto-fill-24 gap-x-2 gap-y-1 auto-rows-min items-start"> {/* Adjusted padding and grid gaps */}
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
@@ -103,7 +103,7 @@ const Index = () => {
         <Window
           title="Welcome"
           onClose={() => closeWindow('welcome')}
-          initialPosition={{ x: 200, y: 150 }}
+          initialPosition={{ x: 100, y: 80 }} {/* Adjusted initial position */}
           zIndex={windowStates.welcome.zIndex}
           onFocus={() => focusWindow('welcome')}
         >
