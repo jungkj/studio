@@ -156,17 +156,17 @@ function ToastProvider({ children }: ToastProviderProps) {
     [dispatch]
   )
 
+  const contextValue = React.useMemo(
+    () => ({
+      toast: addToast,
+      dismiss: (toastId?: string) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
+      toasts: state.toasts,
+    }),
+    [addToast, state.toasts]
+  )
+
   return (
-    <ToastContext.Provider
-      value={React.useMemo(
-        () => ({
-          toast: addToast,
-          dismiss: (toastId?: string) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
-          toasts: state.toasts,
-        }),
-        [addToast, state.toasts]
-      )}
-    >
+    <ToastContext.Provider value={contextValue}>
       {children}
     </ToastContext.Provider>
   )
