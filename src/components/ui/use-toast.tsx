@@ -83,7 +83,7 @@ const ToastContext = React.createContext<ToastContextValue | undefined>(
   undefined
 )
 
-function ToastProvider({ children }: { children: React.ReactNode }) {
+function ToasterContextProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, { toasts: [] })
 
   const toast = React.useCallback(
@@ -139,9 +139,9 @@ function ToastProvider({ children }: { children: React.ReactNode }) {
 function useToast() {
   const context = React.useContext(ToastContext)
   if (context === undefined) {
-    throw new Error("useToast must be used within a ToastProvider")
+    throw new Error("useToast must be used within a ToasterContextProvider")
   }
   return context
 }
 
-export { useToast, ToastProvider }
+export { useToast, ToasterContextProvider }

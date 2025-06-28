@@ -3,14 +3,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { ToastProvider } from "@/components/ui/use-toast"; // Import ToastProvider
+import { ToasterContextProvider } from "@/components/ui/use-toast";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ToastProvider> {/* Wrap the entire app with ToastProvider */}
+      <ToasterContextProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -18,7 +18,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </ToastProvider>
+      </ToasterContextProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
