@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
-import { BlogApp } from '@/components/BlogApp';
+import { EssaysApp } from '@/components/EssaysApp'; // Changed from BlogApp to EssaysApp
 import { AboutApp } from '@/components/AboutApp';
 import { MyComputerApp } from '@/components/MyComputerApp';
-import { NotesApp } from '@/components/NotesApp'; // Import NotesApp
+import { NotesApp } from '@/components/NotesApp';
+import { GamesApp } from '@/components/GamesApp'; // Import GamesApp
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, NotebookText } from 'lucide-react'; // Added NotebookText icon
+import { FileText, User, Monitor, Trash2, NotebookText, Gamepad2 } from 'lucide-react'; // Added Gamepad2 icon
 import { toast } from 'sonner';
 
-type WindowName = 'blog' | 'about' | 'myComputer' | 'notes'; // Added 'notes'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'notes' | 'games'; // Updated 'blog' to 'essays', added 'games'
 
 interface WindowState {
   isOpen: boolean;
@@ -20,13 +21,14 @@ interface WindowState {
 
 const Index = () => {
   const [windowStates, setWindowStates] = useState<Record<WindowName, WindowState>>({
-    blog: { isOpen: false, zIndex: 10 },
+    essays: { isOpen: false, zIndex: 10 }, // Updated 'blog' to 'essays'
     about: { isOpen: false, zIndex: 11 },
     myComputer: { isOpen: false, zIndex: 12 },
-    notes: { isOpen: false, zIndex: 13 }, // Initial z-index for Notes
+    notes: { isOpen: false, zIndex: 13 },
+    games: { isOpen: false, zIndex: 14 }, // Initial z-index for Games
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(13); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(14); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -72,23 +74,24 @@ const Index = () => {
 
       {/* Desktop Icons */}
       <div className="p-4 flex flex-col items-start space-y-2">
-        <DesktopIcon icon={FileText} label="My Blog" onClick={() => openWindow('blog')} />
+        <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} /> {/* Updated label */}
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
-        <DesktopIcon icon={NotebookText} label="Notes" onClick={() => openWindow('notes')} /> {/* New Notes Icon */}
+        <DesktopIcon icon={NotebookText} label="Notes" onClick={() => openWindow('notes')} />
+        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('games')} /> {/* New Games Icon */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
       {/* Active Windows */}
-      {windowStates.blog.isOpen && (
+      {windowStates.essays.isOpen && (
         <Window
-          title="My Blog"
-          onClose={() => closeWindow('blog')}
+          title="My Essays" // Updated title
+          onClose={() => closeWindow('essays')}
           initialPosition={{ x: 50, y: 50 }}
-          zIndex={windowStates.blog.zIndex}
-          onFocus={() => focusWindow('blog')}
+          zIndex={windowStates.essays.zIndex}
+          onFocus={() => focusWindow('essays')}
         >
-          <BlogApp onClose={() => closeWindow('blog')} />
+          <EssaysApp onClose={() => closeWindow('essays')} />
         </Window>
       )}
       {windowStates.about.isOpen && (
@@ -122,6 +125,17 @@ const Index = () => {
           onFocus={() => focusWindow('notes')}
         >
           <NotesApp onClose={() => closeWindow('notes')} />
+        </Window>
+      )}
+      {windowStates.games.isOpen && (
+        <Window
+          title="Games"
+          onClose={() => closeWindow('games')}
+          initialPosition={{ x: 450, y: 250 }}
+          zIndex={windowStates.games.zIndex}
+          onFocus={() => focusWindow('games')}
+        >
+          <GamesApp onClose={() => closeWindow('games')} />
         </Window>
       )}
 
