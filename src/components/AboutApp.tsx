@@ -7,9 +7,9 @@ interface AboutAppProps {
 
 const AboutApp: React.FC<AboutAppProps> = ({ onClose }) => {
   return (
-    <div className="p-2">
-      <h2 className="text-lg font-pixel mb-4">About Me</h2>
-      <div className="pixel-border border-emerald-border p-3 bg-emerald-light-blue/20">
+    <div className="p-2 font-sans text-mac-black">
+      <h2 className="text-lg font-bold mb-4">About Me</h2>
+      <div className="mac-border-inset p-3 bg-mac-light-gray"> {/* macOS inset border and light gray background */}
         <p className="text-sm mb-2">
           Greetings, adventurer! I'm [Your Name], a passionate [Your Profession/Hobby] with a love for all things retro and digital.
         </p>

@@ -3,7 +3,10 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Window } from '@/components/Window';
 import { BlogApp } from '@/components/BlogApp';
 import { AboutApp } from '@/components/AboutApp';
-import { DesktopDock } from '@/components/DesktopDock';
+import { MenuBar } from '@/components/MenuBar'; // Import MenuBar
+import { SystemTray } from '@/components/SystemTray'; // Import SystemTray
+import { DesktopIcon } from '@/components/DesktopIcon'; // Import DesktopIcon
+import { FileText, User, Trash2 } from 'lucide-react'; // Import icons for DesktopIcon
 
 type WindowName = 'blog' | 'about';
 
@@ -54,11 +57,20 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-emerald-dark-green flex flex-col items-start justify-start p-4 relative overflow-hidden">
+    <div className="min-h-screen w-full mac-desktop-bg flex flex-col relative overflow-hidden">
+      {/* Menu Bar */}
+      <MenuBar />
+
+      {/* Desktop Icons */}
+      <div className="p-4 flex flex-col items-start space-y-2">
+        <DesktopIcon icon={FileText} label="My Blog" onClick={() => openWindow('blog')} />
+        <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
+      </div>
+
       {/* Active Windows */}
       {windowStates.blog.isOpen && (
         <Window
-          title="Blog"
+          title="My Blog"
           onClose={() => closeWindow('blog')}
           initialPosition={{ x: 50, y: 50 }}
           zIndex={windowStates.blog.zIndex}
@@ -79,12 +91,13 @@ const Index = () => {
         </Window>
       )}
 
-      {/* Desktop Dock */}
-      <DesktopDock onOpenWindow={openWindow} />
-
-      <div className="absolute bottom-20 right-4">
+      {/* Made with Dyad */}
+      <div className="absolute bottom-10 right-4"> {/* Adjusted position to be above SystemTray */}
         <MadeWithDyad />
       </div>
+
+      {/* System Tray */}
+      <SystemTray />
     </div>
   );
 };
