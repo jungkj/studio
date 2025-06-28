@@ -4,16 +4,18 @@ import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
 import { AboutApp } from '@/components/AboutApp';
 import { MyComputerApp } from '@/components/MyComputerApp';
-import { NotesApp } from '@/components/NotesApp';
-import { GamesApp } from '@/components/GamesApp';
-import { CalculatorApp } from '@/components/CalculatorApp'; // Import CalculatorApp
+import { GamesLauncherApp } from '@/components/GamesLauncherApp'; // Renamed and updated import
+import { TicTacToe } from '@/components/TicTacToe'; // Keep TicTacToe for direct window
+import { SnakeGame } from '@/components/SnakeGame'; // New game import
+import { SudokuGame } from '@/components/SudokuGame'; // New game import
+import { SolitaireGame } from '@/components/SolitaireGame'; // New game import
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
-import { FileText, User, Monitor, Trash2, NotebookText, Gamepad2, Calculator } from 'lucide-react'; // Added Calculator icon
+import { FileText, User, Monitor, Trash2, Gamepad2 } from 'lucide-react'; // Removed NotebookText and Calculator icons
 import { toast } from 'sonner';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'notes' | 'games' | 'calculator'; // Added 'calculator'
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire'; // Updated types
 
 interface WindowState {
   isOpen: boolean;
@@ -25,12 +27,14 @@ const Index = () => {
     essays: { isOpen: false, zIndex: 10 },
     about: { isOpen: false, zIndex: 11 },
     myComputer: { isOpen: false, zIndex: 12 },
-    notes: { isOpen: false, zIndex: 13 },
-    games: { isOpen: false, zIndex: 14 },
-    calculator: { isOpen: false, zIndex: 15 }, // Initial z-index for Calculator
+    gamesLauncher: { isOpen: false, zIndex: 13 }, // Games launcher window
+    ticTacToe: { isOpen: false, zIndex: 14 }, // Individual game window
+    snake: { isOpen: false, zIndex: 15 }, // Individual game window
+    sudoku: { isOpen: false, zIndex: 16 }, // Individual game window
+    solitaire: { isOpen: false, zIndex: 17 }, // Individual game window
   });
 
-  const [maxZIndex, setMaxZIndex] = useState(15); // Updated max z-index
+  const [maxZIndex, setMaxZIndex] = useState(17); // Updated max z-index
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -79,9 +83,7 @@ const Index = () => {
         <DesktopIcon icon={FileText} label="My Essays" onClick={() => openWindow('essays')} />
         <DesktopIcon icon={User} label="About Me" onClick={() => openWindow('about')} />
         <DesktopIcon icon={Monitor} label="My Computer" onClick={() => openWindow('myComputer')} />
-        <DesktopIcon icon={NotebookText} label="Notes" onClick={() => openWindow('notes')} />
-        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('games')} />
-        <DesktopIcon icon={Calculator} label="Calculator" onClick={() => openWindow('calculator')} /> {/* New Calculator Icon */}
+        <DesktopIcon icon={Gamepad2} label="Games" onClick={() => openWindow('gamesLauncher')} /> {/* Opens the launcher */}
         <DesktopIcon icon={Trash2} label="Trash" onClick={handleTrashClick} />
       </div>
 
@@ -119,37 +121,62 @@ const Index = () => {
           <MyComputerApp onClose={() => closeWindow('myComputer')} />
         </Window>
       )}
-      {windowStates.notes.isOpen && (
+      {windowStates.gamesLauncher.isOpen && (
         <Window
-          title="Notes"
-          onClose={() => closeWindow('notes')}
+          title="Games Launcher"
+          onClose={() => closeWindow('gamesLauncher')}
           initialPosition={{ x: 350, y: 200 }}
-          zIndex={windowStates.notes.zIndex}
-          onFocus={() => focusWindow('notes')}
+          zIndex={windowStates.gamesLauncher.zIndex}
+          onFocus={() => focusWindow('gamesLauncher')}
         >
-          <NotesApp onClose={() => closeWindow('notes')} />
+          <GamesLauncherApp
+            onClose={() => closeWindow('gamesLauncher')}
+            onLaunchGame={(gameName) => openWindow(gameName)}
+          />
         </Window>
       )}
-      {windowStates.games.isOpen && (
+      {windowStates.ticTacToe.isOpen && (
         <Window
-          title="Games"
-          onClose={() => closeWindow('games')}
-          initialPosition={{ x: 450, y: 250 }}
-          zIndex={windowStates.games.zIndex}
-          onFocus={() => focusWindow('games')}
+          title="Tic-Tac-Toe"
+          onClose={() => closeWindow('ticTacToe')}
+          initialPosition={{ x: 400, y: 250 }}
+          zIndex={windowStates.ticTacToe.zIndex}
+          onFocus={() => focusWindow('ticTacToe')}
         >
-          <GamesApp onClose={() => closeWindow('games')} />
+          <TicTacToe />
         </Window>
       )}
-      {windowStates.calculator.isOpen && (
+      {windowStates.snake.isOpen && (
         <Window
-          title="Calculator"
-          onClose={() => closeWindow('calculator')}
-          initialPosition={{ x: 550, y: 300 }}
-          zIndex={windowStates.calculator.zIndex}
-          onFocus={() => focusWindow('calculator')}
+          title="Snake"
+          onClose={() => closeWindow('snake')}
+          initialPosition={{ x: 450, y: 300 }}
+          zIndex={windowStates.snake.zIndex}
+          onFocus={() => focusWindow('snake')}
         >
-          <CalculatorApp onClose={() => closeWindow('calculator')} />
+          <SnakeGame onClose={() => closeWindow('snake')} />
+        </Window>
+      )}
+      {windowStates.sudoku.isOpen && (
+        <Window
+          title="Sudoku"
+          onClose={() => closeWindow('sudoku')}
+          initialPosition={{ x: 500, y: 350 }}
+          zIndex={windowStates.sudoku.zIndex}
+          onFocus={() => focusWindow('sudoku')}
+        >
+          <SudokuGame onClose={() => closeWindow('sudoku')} />
+        </Window>
+      )}
+      {windowStates.solitaire.isOpen && (
+        <Window
+          title="Solitaire"
+          onClose={() => closeWindow('solitaire')}
+          initialPosition={{ x: 550, y: 400 }}
+          zIndex={windowStates.solitaire.zIndex}
+          onFocus={() => focusWindow('solitaire')}
+        >
+          <SolitaireGame onClose={() => closeWindow('solitaire')} />
         </Window>
       )}
 
