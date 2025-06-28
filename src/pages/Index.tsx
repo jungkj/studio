@@ -14,10 +14,10 @@ import { WorkApp } from '@/components/WorkApp';
 import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
-import { DesktopIcon } => '@/components/DesktopIcon';
+import { DesktopIcon } from '@/components/DesktopIcon'; // Corrected this line
 import { WelcomeWindow } from '@/components/WelcomeWindow';
-import { Toaster } from '@/components/ui/toaster'; // Import Toaster
-import { useToast } from '@/components/ui/use-toast'; // Corrected import path for useToast
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
 import { FileText, User, Monitor, Trash2, Gamepad2, Mail, Briefcase, Terminal } from 'lucide-react';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome';
@@ -28,7 +28,7 @@ interface WindowState {
 }
 
 const Index = () => {
-  const { toast } = useToast(); // Initialize useToast
+  const { toast } = useToast();
 
   const [windowStates, setWindowStates] = useState<Record<WindowName, WindowState>>({
     essays: { isOpen: false, zIndex: 10 },
