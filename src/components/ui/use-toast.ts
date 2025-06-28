@@ -166,7 +166,7 @@ function ToastProvider({ children }: ToastProviderProps) {
         }),
         [addToast, state.toasts]
       )}
-    > {/* Added the missing '>' here */}
+    >
       {children}
     </ToastContext.Provider>
   )
