@@ -1,0 +1,143 @@
+/* Cursor Styles for Mac-like Interface */
+
+/* CSS Custom Properties for Cursors */
+:root {
+  --cursor-default: url('/pointer_reg.png') 0 0, auto;
+  --cursor-pointer: url('/pointer_click.png') 0 0, pointer;
+  --cursor-grab: url('/pointer_click.png') 0 0, grab;
+  --cursor-grabbing: url('/pointer_click.png') 0 0, grabbing;
+  --cursor-resize: url('/resizer.png') 8 8, nw-resize;
+}
+
+/* Base cursor utility classes */
+.cursor-default {
+  cursor: var(--cursor-default) !important;
+}
+
+.cursor-pointer {
+  cursor: var(--cursor-pointer) !important;
+}
+
+.cursor-grab {
+  cursor: var(--cursor-grab) !important;
+}
+
+.cursor-grabbing {
+  cursor: var(--cursor-grabbing) !important;
+}
+
+.cursor-resize {
+  cursor: var(--cursor-resize) !important;
+}
+
+/* Ensure cursors are applied to interactive elements */
+button, 
+[role="button"], 
+a:not([href=""]) {
+  cursor: var(--cursor-pointer) !important;
+}
+
+/* Text input elements */
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+input[type="password"], 
+input[type="search"], 
+textarea, 
+[contenteditable="true"] {
+  cursor: var(--cursor-default) !important;
+}
+
+/* Draggable elements */
+[draggable="true"], 
+.draggable {
+  cursor: var(--cursor-grab) !important;
+}
+
+[draggable="true"]:active, 
+.draggable:active,
+.dragging {
+  cursor: var(--cursor-grabbing) !important;
+}
+
+/* Resize handles */
+.resize-handle,
+.cursor-resize,
+.resize-nw, 
+.resize-ne, 
+.resize-sw, 
+.resize-se {
+  cursor: var(--cursor-resize) !important;
+}
+
+/* Specific resize directions */
+.resize-n, .resize-s {
+  cursor: url('/resizer.png') 8 8, ns-resize !important;
+}
+
+.resize-e, .resize-w {
+  cursor: url('/resizer.png') 8 8, ew-resize !important;
+}
+
+/* Fallback for browsers that don't support custom cursors */
+@supports not (cursor: url('/pointer_reg.png') 0 0, auto) {
+  .cursor-default, 
+  input[type="text"], 
+  input[type="number"], 
+  textarea, 
+  [contenteditable="true"] {
+    cursor: default !important;
+  }
+
+  .cursor-pointer, 
+  button, 
+  [role="button"], 
+  a:not([href=""]) {
+    cursor: pointer !important;
+  }
+
+  .cursor-grab, 
+  [draggable="true"], 
+  .draggable {
+    cursor: grab !important;
+  }
+
+  .cursor-grabbing, 
+  [draggable="true"]:active, 
+  .draggable:active,
+  .dragging {
+    cursor: grabbing !important;
+  }
+
+  .cursor-resize,
+  .resize-handle {
+    cursor: nw-resize !important;
+  }
+}
+
+/* High DPI support */
+@media (-webkit-min-device-pixel-ratio: 2), 
+       (min-resolution: 192dpi) {
+  :root {
+    /* If you have @2x versions of your cursors, use them here */
+    --cursor-default: url('/pointer_reg.png') 0 0, auto;
+    --cursor-pointer: url('/pointer_click.png') 0 0, pointer;
+    --cursor-grab: url('/pointer_click.png') 0 0, grab;
+    --cursor-grabbing: url('/pointer_click.png') 0 0, grabbing;
+    --cursor-resize: url('/resizer.png') 8 8, nw-resize;
+  }
+}
+
+/* Ensure body has default cursor */
+body {
+  cursor: var(--cursor-default);
+}
+
+/* Disable cursor inheritance for certain elements */
+.cursor-auto {
+  cursor: auto !important;
+}
+
+.cursor-none {
+  cursor: none !important;
+} 

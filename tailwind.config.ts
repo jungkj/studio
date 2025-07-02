@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -71,9 +72,35 @@ export default {
         // New macOS-inspired grayscale colors
         'mac-light-gray': 'hsl(var(--mac-light-gray))',
         'mac-medium-gray': 'hsl(var(--mac-medium-gray))',
+        'mac-darker-gray': 'hsl(var(--mac-darker-gray))',
         'mac-dark-gray': 'hsl(var(--mac-dark-gray))',
         'mac-black': 'hsl(var(--mac-black))',
         'mac-white': 'hsl(var(--mac-white))',
+        // Apple-inspired colors
+        'apple-blue': 'hsl(var(--apple-blue))',
+        'apple-blue-dark': 'hsl(var(--apple-blue-dark))',
+        'apple-rainbow': {
+          red: 'hsl(var(--apple-rainbow-red))',
+          orange: 'hsl(var(--apple-rainbow-orange))',
+          yellow: 'hsl(var(--apple-rainbow-yellow))',
+          green: 'hsl(var(--apple-rainbow-green))',
+          blue: 'hsl(var(--apple-rainbow-blue))',
+          purple: 'hsl(var(--apple-rainbow-purple))',
+        },
+        // Cream color variants for subtle warmth
+        'cream': {
+          25: '#fefdf9',
+          50: '#fdf8f0',
+          100: '#faf2e0',
+          200: '#f5e6c8',
+          300: '#edd5a3',
+          400: '#e1bc6f',
+          500: '#d4a043',
+          600: '#c2892a',
+          700: '#a06f21',
+          800: '#845a20',
+          900: '#6f4a1f',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -104,5 +131,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;
