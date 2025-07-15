@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { SpotifyCurrentlyPlaying } from '@/utils/spotifyService';
+import { SpotifyCurrentlyPlaying, spotifyService, SpotifyAudioFeatures } from '@/utils/spotifyService';
 import { useSpotify } from '@/hooks/useSpotify';
+import { youtubeAudioService, YouTubePlayerState } from '@/utils/youtubeAudioService';
 import { Window } from './Window';
 import { 
   Volume2, 
@@ -14,7 +15,10 @@ import {
   RefreshCw,
   LogIn,
   LogOut,
-  Square
+  Square,
+  Radio,
+  Youtube,
+  AlertCircle
 } from 'lucide-react';
 import { PixelButton } from './PixelButton';
 
@@ -32,6 +36,69 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
   const animationRef = useRef<number>();
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 });
   const [currentPlayingTrack, setCurrentPlayingTrack] = useState<SpotifyCurrentlyPlaying | null>(null);
+  const [audioFeatures, setAudioFeatures] = useState<SpotifyAudioFeatures | null>(null);
+  const [isLivePlayback, setIsLivePlayback] = useState(false);
+  const [youtubeState, setYoutubeState] = useState<YouTubePlayerState>({
+    isReady: false,
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+    volume: 0.7,
+    videoId: null
+  });
+  const [isSearchingYouTube, setIsSearchingYouTube] = useState(false);
+  const youtubeProgressRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize YouTube player and listen for state changes
+  useEffect(() => {
+    youtubeAudioService.onStateChange((state) => {
+      setYoutubeState(state);
+    });
+
+    // Update progress regularly when playing
+    const updateProgress = () => {
+      if (youtubeState.isPlaying) {
+        const state = youtubeAudioService.getState();
+        setYoutubeState(state);
+      }
+    };
+
+    youtubeProgressRef.current = setInterval(updateProgress, 100);
+
+    return () => {
+      if (youtubeProgressRef.current) {
+        clearInterval(youtubeProgressRef.current);
+      }
+    };
+  }, [youtubeState.isPlaying]);
+
+  // Play track on YouTube
+  const playYouTubeTrack = useCallback(async (track: SpotifyCurrentlyPlaying) => {
+    if (!track.item) return;
+    
+    setIsSearchingYouTube(true);
+    try {
+      const success = await youtubeAudioService.searchAndPlay(track.item);
+      if (!success) {
+        console.error('Could not find track on YouTube');
+      }
+    } catch (error) {
+      console.error('Error playing YouTube track:', error);
+    } finally {
+      setIsSearchingYouTube(false);
+    }
+  }, []);
+
+  // Sync YouTube playback with Spotify
+  useEffect(() => {
+    if (isLivePlayback && currentTrack && !youtubeState.isPlaying && !isSearchingYouTube) {
+      // Automatically play on YouTube when Spotify starts playing
+      playYouTubeTrack(currentTrack);
+    } else if (!isLivePlayback && youtubeState.isPlaying) {
+      // Stop YouTube when Spotify stops
+      youtubeAudioService.pause();
+    }
+  }, [isLivePlayback, currentTrack, youtubeState.isPlaying, isSearchingYouTube, playYouTubeTrack]);
 
   // Use the enhanced Spotify hook with browser audio controls
   const {
@@ -64,6 +131,31 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
 
   // Get the track to display (current or last played)
   const displayTrack = currentTrack || lastPlayedTrack;
+  
+  // Check if we're showing live playback
+  useEffect(() => {
+    setIsLivePlayback(!!currentTrack?.is_playing);
+  }, [currentTrack]);
+  
+  // Fetch audio features for the current track
+  useEffect(() => {
+    const fetchAudioFeatures = async () => {
+      if (!displayTrack?.item?.id) {
+        setAudioFeatures(null);
+        return;
+      }
+      
+      try {
+        const features = await spotifyService.getAudioFeatures(displayTrack.item.id);
+        setAudioFeatures(features);
+      } catch (error) {
+        console.error('Failed to fetch audio features:', error);
+        setAudioFeatures(null);
+      }
+    };
+    
+    fetchAudioFeatures();
+  }, [displayTrack?.item?.id]);
 
   // Memoize canvas size calculation to prevent frequent updates
   const updateCanvasSize = useCallback(() => {
@@ -171,7 +263,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
   const generateFrequencyData = useCallback((): number[] => {
     const bars = 128;
     
-    // Use real audio data if available
+    // Use preview audio data if available
     if (audioData && audioData.frequencyData && audioData.isPlaying) {
       // Convert Uint8Array to normalized array
       const data = new Array(bars);
@@ -199,8 +291,8 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
       return data;
     }
     
-    // If track is paused, show low-energy pattern
-    if (!audioBrowserPlaying) {
+    // If track is paused and not live, show low-energy pattern
+    if (!audioBrowserPlaying && !isLivePlayback) {
       for (let i = 0; i < bars; i++) {
         const freq = i / bars;
         const pausedWave = Math.sin(time * 0.5 + freq * 4) * 0.15 + 0.1;
@@ -210,7 +302,9 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
     }
 
     // Enhanced visualization for playing track
-    const trackProgress = currentTime / Math.max(duration, 30); // Use 30s as fallback for previews
+    const trackProgress = isLivePlayback ? 
+      (currentTrack?.progress_ms || 0) / (displayTrack.item?.duration_ms || 1) :
+      currentTime / Math.max(duration, 30);
     
     // Create signature based on track name for consistent patterns
     const trackName = displayTrack.item?.name || '';
@@ -220,22 +314,32 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
       return a & a;
     }, 0);
     
-    const trackIntensity = Math.abs(trackHash % 100) / 100;
+    // Use audio features if available for more accurate visualization
+    const energy = audioFeatures?.energy || 0.5;
+    const danceability = audioFeatures?.danceability || 0.5;
+    const tempo = audioFeatures?.tempo || 120;
+    const valence = audioFeatures?.valence || 0.5; // Positivity of the track
+    
+    const trackIntensity = audioFeatures ? energy : Math.abs(trackHash % 100) / 100;
     const progressPhase = trackProgress * Math.PI * 6;
     const trackPhase = (trackHash % 1000) / 1000 * Math.PI * 2;
+    
+    // Adjust visualization speed based on tempo
+    const tempoFactor = tempo / 120; // Normalize to 120 BPM
+    const adjustedTime = time * tempoFactor;
     
     for (let i = 0; i < bars; i++) {
       const freq = i / bars;
       
-      // Enhanced frequency response curve
-      const bassBoost = i < bars * 0.2 ? 1.8 + trackIntensity * 0.3 : 1.0;
-      const midBoost = i > bars * 0.2 && i < bars * 0.7 ? 1.4 + trackIntensity * 0.2 : 1.0;
-      const highCut = i > bars * 0.8 ? 0.7 + trackIntensity * 0.2 : 1.0;
+      // Enhanced frequency response curve based on audio features
+      const bassBoost = i < bars * 0.2 ? 1.8 + energy * 0.5 : 1.0;
+      const midBoost = i > bars * 0.2 && i < bars * 0.7 ? 1.4 + danceability * 0.3 : 1.0;
+      const highCut = i > bars * 0.8 ? 0.7 + valence * 0.3 : 1.0;
       
-      // Stable wave patterns
-      const wave1 = Math.sin(time * 1.5 + freq * 7 + progressPhase * 0.7 + trackPhase) * 0.35;
-      const wave2 = Math.sin(time * 2.2 + freq * 11 + progressPhase * 1.1) * 0.25;
-      const wave3 = Math.sin(time * 0.8 + freq * 5 + trackPhase) * 0.18;
+      // Stable wave patterns adjusted for tempo
+      const wave1 = Math.sin(adjustedTime * 1.5 + freq * 7 + progressPhase * 0.7 + trackPhase) * 0.35;
+      const wave2 = Math.sin(adjustedTime * 2.2 + freq * 11 + progressPhase * 1.1) * 0.25;
+      const wave3 = Math.sin(adjustedTime * 0.8 + freq * 5 + trackPhase) * 0.18;
       
       // Combine waves with frequency response
       let amplitude = (wave1 + wave2 + wave3) * bassBoost * midBoost * highCut;
@@ -245,7 +349,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
     }
     
     return data;
-  }, [audioData, displayTrack, audioBrowserPlaying, currentTime, duration]);
+  }, [audioData, displayTrack, audioBrowserPlaying, currentTime, duration, isLivePlayback, currentTrack, audioFeatures, youtubeState.isPlaying]);
 
   // Memoize color function to prevent recalculation
   const getFrequencyColor = useMemo(() => {
@@ -253,14 +357,55 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
       const freq = index / total;
       const intensity = amplitude;
       
-      // Color based on frequency range
+      // If YouTube is playing, use blue color scheme
+      if (youtubeState.isPlaying) {
+        if (freq < 0.33) {
+          // Bass - Dark to Light Blue
+          const blue = Math.floor(100 + 155 * intensity);
+          const green = Math.floor(50 * intensity);
+          return `rgb(0, ${green}, ${blue})`;
+        } else if (freq < 0.66) {
+          // Mid - Blue to Cyan
+          const blue = Math.floor(200 + 55 * intensity);
+          const green = Math.floor(150 * intensity);
+          return `rgb(0, ${green}, ${blue})`;
+        } else {
+          // High - Cyan to White
+          const blue = Math.floor(200 + 55 * intensity);
+          const green = Math.floor(200 + 55 * intensity);
+          const red = Math.floor(100 * intensity);
+          return `rgb(${red}, ${green}, ${blue})`;
+        }
+      }
+      
+      // If live playback on Spotify, use green color scheme
+      if (isLivePlayback) {
+        if (freq < 0.33) {
+          // Bass - Dark to Light Green
+          const green = Math.floor(100 + 155 * intensity);
+          const red = Math.floor(20 * intensity);
+          return `rgb(${red}, ${green}, 0)`;
+        } else if (freq < 0.66) {
+          // Mid - Light Green to Cyan
+          const green = Math.floor(200 + 55 * intensity);
+          const blue = Math.floor(100 * intensity);
+          return `rgb(0, ${green}, ${blue})`;
+        } else {
+          // High - Cyan to Light Blue
+          const green = Math.floor(150 + 105 * intensity);
+          const blue = Math.floor(150 + 105 * intensity);
+          return `rgb(0, ${green}, ${blue})`;
+        }
+      }
+      
+      // Default color scheme for non-live playback
       if (freq < 0.33) {
         // Bass - Red to Orange
         const red = Math.floor(255 * intensity);
         const green = Math.floor(100 * intensity);
         return `rgb(${red}, ${green}, 0)`;
       } else if (freq < 0.66) {
-        // Mid - Green to Yellow
+        // Mid - Orange to Yellow
         const red = Math.floor(200 * intensity);
         const green = Math.floor(255 * intensity);
         return `rgb(${red}, ${green}, 0)`;
@@ -271,7 +416,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
         return `rgb(${red}, 0, ${blue})`;
       }
     };
-  }, []);
+  }, [isLivePlayback, youtubeState.isPlaying]);
 
   // Optimized drawing function with memoization
   const drawVisualizer = useCallback(() => {
@@ -354,7 +499,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
 
   return (
     <Window
-      title="Spotify Audio Visualizer (Browser Playback)"
+      title={`Spotify Audio Visualizer ${youtubeState.isPlaying ? '🎵 Playing' : isLivePlayback ? '🟢 Live' : ''}`}
       onClose={onClose}
       initialSize={{ width: 900, height: 700 }}
       initialPosition={{ x: 200, y: 100 }}
@@ -372,8 +517,21 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                 <h2 className="text-lg pixel-font font-bold text-mac-black">
                   Spotify Visualizer
                 </h2>
-                <p className="text-xs text-mac-dark-gray pixel-font">
-                  {isAuthenticated ? 'Connected • Browser Playback' : 'Not connected'}
+                <p className="text-xs text-mac-dark-gray pixel-font flex items-center gap-2">
+                  {isAuthenticated ? (
+                    <>
+                      {isLivePlayback ? (
+                        <span className="flex items-center gap-1 text-green-600">
+                          <Radio size={10} className="animate-pulse" />
+                          <span>Live • Playing on Spotify</span>
+                        </span>
+                      ) : (
+                        <span>Connected • Last Played</span>
+                      )}
+                    </>
+                  ) : (
+                    'Not connected'
+                  )}
                 </p>
                 {isAuthenticated && !currentTrack && (
                   <p className="text-xs text-blue-600 pixel-font mt-1">
@@ -497,10 +655,68 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
           <div className="flex items-center justify-between">
             {/* Playback Controls */}
             <div className="flex items-center gap-2">
+              {/* Spotify Controls (when authenticated) */}
+              {isAuthenticated && (
+                <>
+                  <PixelButton
+                    onClick={async () => {
+                      try {
+                        await spotifyService.skipToPrevious();
+                        setTimeout(refresh, 500);
+                      } catch (error) {
+                        console.error('Failed to skip to previous:', error);
+                      }
+                    }}
+                    className="!px-3 !py-2"
+                    title="Previous Track (Spotify)"
+                  >
+                    <SkipBack size={16} />
+                  </PixelButton>
+                  
+                  <PixelButton
+                    onClick={async () => {
+                      try {
+                        if (isLivePlayback) {
+                          await spotifyService.pausePlayback();
+                        } else {
+                          await spotifyService.resumePlayback();
+                        }
+                        setTimeout(refresh, 500);
+                      } catch (error) {
+                        console.error('Failed to control playback:', error);
+                      }
+                    }}
+                    className={`!px-4 !py-2 ${isLivePlayback ? 'bg-green-600 hover:bg-green-700' : 'bg-apple-blue hover:bg-blue-600'} text-white`}
+                    title={isLivePlayback ? 'Pause Spotify' : 'Play on Spotify'}
+                  >
+                    {isLivePlayback ? <Pause size={20} /> : <Play size={20} />}
+                  </PixelButton>
+                  
+                  <PixelButton
+                    onClick={async () => {
+                      try {
+                        await spotifyService.skipToNext();
+                        setTimeout(refresh, 500);
+                      } catch (error) {
+                        console.error('Failed to skip to next:', error);
+                      }
+                    }}
+                    className="!px-3 !py-2"
+                    title="Next Track (Spotify)"
+                  >
+                    <SkipForward size={16} />
+                  </PixelButton>
+                  
+                  <div className="w-px h-8 bg-mac-dark-gray mx-2" />
+                </>
+              )}
+              
+              {/* Preview Controls */}
               <PixelButton
                 onClick={handleTogglePlayback}
                 disabled={!displayTrack?.item?.preview_url}
                 className="!px-4 !py-2 bg-apple-blue hover:bg-blue-600 text-white disabled:bg-gray-400"
+                title="Play/Pause Preview"
               >
                 {audioBrowserPlaying ? <Pause size={20} /> : <Play size={20} />}
               </PixelButton>
@@ -509,9 +725,32 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                 onClick={handleStopPlayback}
                 disabled={!audioBrowserPlaying}
                 className="!px-3 !py-2 disabled:bg-gray-400"
+                title="Stop Preview"
               >
                 <Square size={16} />
               </PixelButton>
+              
+              {/* YouTube Controls */}
+              {displayTrack && (
+                <>
+                  <div className="w-px h-8 bg-mac-dark-gray mx-2" />
+                  <PixelButton
+                    onClick={() => {
+                      if (youtubeState.isPlaying) {
+                        youtubeAudioService.pause();
+                      } else if (displayTrack) {
+                        playYouTubeTrack(displayTrack);
+                      }
+                    }}
+                    disabled={isSearchingYouTube}
+                    className={`!px-4 !py-2 ${youtubeState.isPlaying ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                    title={youtubeState.isPlaying ? 'Stop YouTube' : 'Play on YouTube'}
+                  >
+                    <Youtube size={16} />
+                    {isSearchingYouTube ? 'Searching...' : youtubeState.isPlaying ? 'Stop' : 'YouTube'}
+                  </PixelButton>
+                </>
+              )}
             </div>
 
             {/* Volume Controls */}
@@ -557,24 +796,51 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
           {isAuthenticated && !displayTrack && (
             <div className="mt-3 p-2 bg-blue-100 mac-border-inset rounded">
               <p className="text-xs pixel-font text-blue-800">
-                <strong>🎵 Start playing music on Spotify</strong> to see live visualization, or play a preview below if available.
+                <strong>🎵 Start playing music on Spotify</strong> to see live visualization!
               </p>
             </div>
           )}
           
-          {displayTrack && !displayTrack.item?.preview_url && !currentTrack && (
+          {isAuthenticated && displayTrack && !isLivePlayback && (
             <div className="mt-3 p-2 bg-orange-100 mac-border-inset rounded">
               <p className="text-xs pixel-font text-orange-800">
-                <strong>This track doesn't have a preview available.</strong><br/>
-                For live visualization: Start playing this song on Spotify (phone, desktop, or web player).
+                <strong>Showing last played:</strong> {displayTrack.item?.name || 'Unknown'}<br/>
+                Start playing on Spotify to see live visualization in green!
               </p>
             </div>
           )}
           
-          {displayTrack?.item?.preview_url && (
+          {isAuthenticated && isLivePlayback && (
             <div className="mt-3 p-2 bg-green-100 mac-border-inset rounded">
               <p className="text-xs pixel-font text-green-800">
+                <strong>🟢 Live:</strong> Currently playing on your Spotify!<br/>
+                Controls above sync with your active Spotify device.
+              </p>
+            </div>
+          )}
+          
+          {displayTrack?.item?.preview_url && !isLivePlayback && (
+            <div className="mt-3 p-2 bg-blue-100 mac-border-inset rounded">
+              <p className="text-xs pixel-font text-blue-800">
                 <strong>Preview available!</strong> Click play to hear a 30-second preview with visualization.
+              </p>
+            </div>
+          )}
+          
+          {youtubeState.isPlaying && (
+            <div className="mt-3 p-2 bg-blue-100 mac-border-inset rounded">
+              <p className="text-xs pixel-font text-blue-800">
+                <strong>🎵 YouTube Audio Playing!</strong><br/>
+                Full track playback with real-time visualization.
+              </p>
+            </div>
+          )}
+          
+          {isSearchingYouTube && (
+            <div className="mt-3 p-2 bg-yellow-100 mac-border-inset rounded">
+              <p className="text-xs pixel-font text-yellow-800">
+                <strong>🔍 Searching YouTube...</strong><br/>
+                Looking for "{displayTrack?.item?.name}" by {displayTrack?.item?.artists?.[0]?.name}
               </p>
             </div>
           )}

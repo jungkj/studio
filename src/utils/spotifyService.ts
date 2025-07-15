@@ -52,7 +52,28 @@ export interface SpotifyRecentlyPlayed {
   items: Array<{
     track: SpotifyTrack;
     played_at: string;
+    context?: {
+      type: string;
+      uri: string;
+    };
   }>;
+}
+
+export interface SpotifyAudioFeatures {
+  id: string;
+  duration_ms: number;
+  tempo: number;
+  energy: number;
+  danceability: number;
+  speechiness: number;
+  acousticness: number;
+  instrumentalness: number;
+  liveness: number;
+  valence: number;
+  loudness: number;
+  key: number;
+  mode: number;
+  time_signature: number;
 }
 
 class SpotifyService {
@@ -297,6 +318,33 @@ class SpotifyService {
       }
     } catch (error) {
       console.error('🎵 Error fetching recently played:', error);
+      return null;
+    }
+  }
+
+  public async getAudioFeatures(trackId: string): Promise<SpotifyAudioFeatures | null> {
+    if (!(await this.ensureValidToken())) {
+      console.warn('🎵 No valid token for getAudioFeatures');
+      return null;
+    }
+
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🎵 Audio features loaded for track:', trackId);
+        return data;
+      } else {
+        console.error('🎵 Error fetching audio features:', response.status, response.statusText);
+        return null;
+      }
+    } catch (error) {
+      console.error('🎵 Error fetching audio features:', error);
       return null;
     }
   }
