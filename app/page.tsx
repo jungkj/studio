@@ -3,5 +3,11 @@
 import Desktop from "@/components/Desktop";
 
 export default function Home() {
-  return <Desktop />;
+  return (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>Mac OS Classic Desktop Environment</h1>
+      <p>Loading...</p>
+      <p>If you can see this, the app is working.</p>
+    </div>
+  );
 }
