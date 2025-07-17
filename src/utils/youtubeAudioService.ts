@@ -82,17 +82,20 @@ class YouTubeAudioService {
   private searchCache: Map<string, string> = new Map();
 
   constructor() {
-    this.initializeAPI();
+    if (typeof window !== 'undefined') {
+      this.initializeAPI();
+    }
   }
 
   private initializeAPI(): void {
     // Check if API is already loaded
-    if (window.YT) {
+    if (typeof window !== 'undefined' && window.YT) {
       this.isAPIReady = true;
       return;
     }
 
     // Load YouTube IFrame API
+    if (typeof document === 'undefined') return;
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
     const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -211,7 +214,7 @@ class YouTubeAudioService {
     }
 
     try {
-      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
       
       if (!apiKey) {
         console.warn('YouTube API key not configured, using demo mode');
@@ -313,5 +316,14 @@ class YouTubeAudioService {
   }
 }
 
-// Export singleton instance
-export const youtubeAudioService = new YouTubeAudioService();
+// Export singleton instance with lazy initialization
+let youtubeAudioServiceInstance: YouTubeAudioService | null = null;
+
+export const youtubeAudioService = {
+  get instance(): YouTubeAudioService {
+    if (!youtubeAudioServiceInstance && typeof window !== 'undefined') {
+      youtubeAudioServiceInstance = new YouTubeAudioService();
+    }
+    return youtubeAudioServiceInstance!;
+  }
+};

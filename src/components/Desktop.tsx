@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
@@ -20,7 +22,7 @@ import { Clock } from '@/components/Clock';
 import { SettingsModal } from '@/components/SettingsModal';
 import { SimpleCalculator } from '@/components/SimpleCalculator';
 import { SpotifyAudioVisualizer } from '@/components/SpotifyAudioVisualizer';
-import { useToast } from '@/components/ui/use-toast.tsx';
+import { useToast } from '@/components/ui/use-toast';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome' | 'clock' | 'calculator' | 'spotifyVisualizer';
 

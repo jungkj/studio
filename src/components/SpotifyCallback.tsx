@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { spotifyService } from '@/utils/spotifyService';
 
@@ -34,7 +36,7 @@ const SpotifyCallback: React.FC = () => {
         }
 
         console.log('🎵 Starting token exchange with code:', code.substring(0, 20) + '...');
-        const success = await spotifyService.handleAuthCallback(code);
+        const success = await spotifyService.instance.handleAuthCallback(code);
         
         if (success) {
           console.log('🎵 Token exchange successful!');

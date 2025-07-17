@@ -5,16 +5,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
-- `npm run dev` - Start development server on port 8080
-- `npm run build` - Production build
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
+- `npm run dev` - Start Next.js development server on port 3000
+- `npm run build` - Production build with Next.js
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint with Next.js configuration
 
 ### Testing
 **Note**: No testing framework is currently configured. To add testing:
-1. Install Vitest: `npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom`
-2. Add test script to package.json: `"test": "vitest"`
-3. Create vitest.config.ts
+1. Install Jest: `npm install -D jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom`
+2. Add test script to package.json: `"test": "jest"`
+3. Create jest.config.js for Next.js
 
 ## Architecture Overview
 
@@ -22,7 +22,7 @@ This is a React TypeScript application featuring a retro Mac OS-style desktop en
 
 ### Tech Stack
 - **Framework**: React 18.3.1 with TypeScript
-- **Build Tool**: Vite with SWC
+- **Build Tool**: Next.js 15.4.1
 - **Styling**: Tailwind CSS with custom macOS-inspired design system
 - **UI Components**: Shadcn/UI (50+ pre-installed components)
 - **State Management**: React Query (TanStack Query)
@@ -31,13 +31,16 @@ This is a React TypeScript application featuring a retro Mac OS-style desktop en
 
 ### Project Structure
 ```
+app/
+├── layout.tsx       # Root layout with providers
+├── page.tsx         # Home page (main desktop)
+├── not-found.tsx    # 404 page
+└── spotify-callback/ # Spotify OAuth callback route
 src/
-├── components/       # UI components (all shadcn/ui components pre-installed)
-├── pages/           # Page components (Index.tsx is the main desktop)
-├── hooks/           # Custom hooks (useAuth, useSpotify, etc.)
+├── components/      # UI components (all shadcn/ui components pre-installed)
+├── hooks/           # Custom hooks (useAuth, useSpotify, etc.)  
 ├── utils/           # Services and utilities
-├── App.tsx          # Router configuration
-└── main.tsx         # Entry point
+└── globals.css      # Global styles
 ```
 
 ### Key Features
@@ -62,8 +65,9 @@ src/
    - Follow retro Mac OS aesthetic
 
 3. **Routing**:
-   - Define routes in App.tsx
+   - Next.js App Router with file-based routing
    - Desktop apps open as windows, not separate routes
+   - Client components marked with 'use client' directive
 
 4. **Backend Integration**:
    - Supabase client configured in utils/supabaseConfig.ts

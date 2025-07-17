@@ -89,6 +89,7 @@ The internet is full of highlight reels. Be the director's cut.`,
 export const essayStorage = {
   // Initialize with default essays if none exist
   init(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     const existing = localStorage.getItem(STORAGE_KEY);
     if (!existing) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultEssays));
@@ -97,12 +98,14 @@ export const essayStorage = {
 
   // Get all essays
   getAll(): Essay[] {
+    if (typeof window === 'undefined' || !window.localStorage) return defaultEssays;
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : defaultEssays;
   },
 
   // Save essays
   saveAll(essays: Essay[]): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(essays));
   },
 
@@ -146,11 +149,13 @@ export const essayStorage = {
 
   // Admin authentication
   checkAdminAuth(): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
     const auth = localStorage.getItem(ADMIN_AUTH_KEY);
     return auth === 'authenticated';
   },
 
   setAdminAuth(password: string): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
     // Simple password check - in production, use proper authentication
     if (password === 'andyadmin2025') {
       localStorage.setItem(ADMIN_AUTH_KEY, 'authenticated');
@@ -160,9 +165,12 @@ export const essayStorage = {
   },
 
   clearAdminAuth(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     localStorage.removeItem(ADMIN_AUTH_KEY);
   }
 };
 
-// Initialize on module load
-essayStorage.init(); 
+// Initialize on module load (only in browser)
+if (typeof window !== 'undefined') {
+  essayStorage.init();
+} 

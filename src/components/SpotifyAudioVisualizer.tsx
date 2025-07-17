@@ -49,58 +49,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
   const [isSearchingYouTube, setIsSearchingYouTube] = useState(false);
   const youtubeProgressRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize YouTube player and listen for state changes
-  useEffect(() => {
-    youtubeAudioService.onStateChange((state) => {
-      setYoutubeState(state);
-    });
-
-    // Update progress regularly when playing
-    const updateProgress = () => {
-      if (youtubeState.isPlaying) {
-        const state = youtubeAudioService.getState();
-        setYoutubeState(state);
-      }
-    };
-
-    youtubeProgressRef.current = setInterval(updateProgress, 100);
-
-    return () => {
-      if (youtubeProgressRef.current) {
-        clearInterval(youtubeProgressRef.current);
-      }
-    };
-  }, [youtubeState.isPlaying]);
-
-  // Play track on YouTube
-  const playYouTubeTrack = useCallback(async (track: SpotifyCurrentlyPlaying) => {
-    if (!track.item) return;
-    
-    setIsSearchingYouTube(true);
-    try {
-      const success = await youtubeAudioService.searchAndPlay(track.item);
-      if (!success) {
-        console.error('Could not find track on YouTube');
-      }
-    } catch (error) {
-      console.error('Error playing YouTube track:', error);
-    } finally {
-      setIsSearchingYouTube(false);
-    }
-  }, []);
-
-  // Sync YouTube playback with Spotify
-  useEffect(() => {
-    if (isLivePlayback && currentTrack && !youtubeState.isPlaying && !isSearchingYouTube) {
-      // Automatically play on YouTube when Spotify starts playing
-      playYouTubeTrack(currentTrack);
-    } else if (!isLivePlayback && youtubeState.isPlaying) {
-      // Stop YouTube when Spotify stops
-      youtubeAudioService.pause();
-    }
-  }, [isLivePlayback, currentTrack, youtubeState.isPlaying, isSearchingYouTube, playYouTubeTrack]);
-
-  // Use the enhanced Spotify hook with browser audio controls
+  // Use the enhanced Spotify hook with browser audio controls - moved up to fix reference error
   const {
     currentTrack,
     lastPlayedTrack,
@@ -129,6 +78,57 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
     isAudioAnalysisActive,
   } = useSpotify();
 
+  // Initialize YouTube player and listen for state changes
+  useEffect(() => {
+    youtubeAudioService.instance.onStateChange((state) => {
+      setYoutubeState(state);
+    });
+
+    // Update progress regularly when playing
+    const updateProgress = () => {
+      if (youtubeState.isPlaying) {
+        const state = youtubeAudioService.instance.getState();
+        setYoutubeState(state);
+      }
+    };
+
+    youtubeProgressRef.current = setInterval(updateProgress, 100);
+
+    return () => {
+      if (youtubeProgressRef.current) {
+        clearInterval(youtubeProgressRef.current);
+      }
+    };
+  }, [youtubeState.isPlaying]);
+
+  // Play track on YouTube
+  const playYouTubeTrack = useCallback(async (track: SpotifyCurrentlyPlaying) => {
+    if (!track.item) return;
+    
+    setIsSearchingYouTube(true);
+    try {
+      const success = await youtubeAudioService.instance.searchAndPlay(track.item);
+      if (!success) {
+        console.error('Could not find track on YouTube');
+      }
+    } catch (error) {
+      console.error('Error playing YouTube track:', error);
+    } finally {
+      setIsSearchingYouTube(false);
+    }
+  }, []);
+
+  // Sync YouTube playback with Spotify
+  useEffect(() => {
+    if (isLivePlayback && currentTrack && !youtubeState.isPlaying && !isSearchingYouTube) {
+      // Automatically play on YouTube when Spotify starts playing
+      playYouTubeTrack(currentTrack);
+    } else if (!isLivePlayback && youtubeState.isPlaying) {
+      // Stop YouTube when Spotify stops
+      youtubeAudioService.instance.pause();
+    }
+  }, [isLivePlayback, currentTrack, youtubeState.isPlaying, isSearchingYouTube, playYouTubeTrack]);
+
   // Get the track to display (current or last played)
   const displayTrack = currentTrack || lastPlayedTrack;
   
@@ -146,7 +146,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
       }
       
       try {
-        const features = await spotifyService.getAudioFeatures(displayTrack.item.id);
+        const features = await spotifyService.instance.getAudioFeatures(displayTrack.item.id);
         setAudioFeatures(features);
       } catch (error) {
         console.error('Failed to fetch audio features:', error);
@@ -661,7 +661,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                   <PixelButton
                     onClick={async () => {
                       try {
-                        await spotifyService.skipToPrevious();
+                        await spotifyService.instance.skipToPrevious();
                         setTimeout(refresh, 500);
                       } catch (error) {
                         console.error('Failed to skip to previous:', error);
@@ -677,9 +677,9 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                     onClick={async () => {
                       try {
                         if (isLivePlayback) {
-                          await spotifyService.pausePlayback();
+                          await spotifyService.instance.pausePlayback();
                         } else {
-                          await spotifyService.resumePlayback();
+                          await spotifyService.instance.resumePlayback();
                         }
                         setTimeout(refresh, 500);
                       } catch (error) {
@@ -695,7 +695,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                   <PixelButton
                     onClick={async () => {
                       try {
-                        await spotifyService.skipToNext();
+                        await spotifyService.instance.skipToNext();
                         setTimeout(refresh, 500);
                       } catch (error) {
                         console.error('Failed to skip to next:', error);
@@ -737,7 +737,7 @@ const SpotifyAudioVisualizer: React.FC<SpotifyAudioVisualizerProps> = ({
                   <PixelButton
                     onClick={() => {
                       if (youtubeState.isPlaying) {
-                        youtubeAudioService.pause();
+                        youtubeAudioService.instance.pause();
                       } else if (displayTrack) {
                         playYouTubeTrack(displayTrack);
                       }

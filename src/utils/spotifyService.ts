@@ -99,10 +99,13 @@ class SpotifyService {
     this.scopes = config.scopes;
     
     // Try to load stored tokens
-    this.loadStoredTokens();
+    if (typeof window !== 'undefined') {
+      this.loadStoredTokens();
+    }
   }
 
   private loadStoredTokens(): void {
+    if (typeof window === 'undefined') return;
     try {
       const storedAccessToken = localStorage.getItem('spotify_access_token');
       const storedRefreshToken = localStorage.getItem('spotify_refresh_token');
@@ -130,6 +133,7 @@ class SpotifyService {
   }
 
   private storeTokens(authResponse: SpotifyAuthResponse): void {
+    if (typeof window === 'undefined') return;
     try {
       this.accessToken = authResponse.access_token;
       this.tokenExpiry = Date.now() + (authResponse.expires_in * 1000);
@@ -586,12 +590,21 @@ class SpotifyService {
   }
 }
 
-// Export singleton instance
-export const spotifyService = new SpotifyService();
+// Export singleton instance with lazy initialization
+let spotifyServiceInstance: SpotifyService | null = null;
+
+export const spotifyService = {
+  get instance(): SpotifyService {
+    if (!spotifyServiceInstance && typeof window !== 'undefined') {
+      spotifyServiceInstance = new SpotifyService();
+    }
+    return spotifyServiceInstance!;
+  }
+};
 
 // Make the service available globally for debugging
 if (typeof window !== 'undefined') {
-  (window as typeof window & { spotifyService: SpotifyService }).spotifyService = spotifyService;
+  (window as typeof window & { spotifyService: typeof spotifyService }).spotifyService = spotifyService;
   console.log('🎵 SpotifyService available globally as window.spotifyService');
-  console.log('🎵 Try: spotifyService.testCurrentlyPlaying() to test the API');
+  console.log('🎵 Try: spotifyService.instance.testCurrentlyPlaying() to test the API');
 } 

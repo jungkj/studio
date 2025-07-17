@@ -2,8 +2,8 @@
 
 export const getSpotifyRedirectUri = (): string => {
   // Check for environment variable first
-  if (import.meta.env.VITE_SPOTIFY_REDIRECT_URI) {
-    return import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+  if (process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI) {
+    return process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
   }
 
   // Always use current origin for development to handle dynamic ports
@@ -36,8 +36,8 @@ export const getSpotifyRedirectUri = (): string => {
 
 export const getSpotifyConfig = () => {
   return {
-    clientId: import.meta.env.VITE_SPOTIFY_CLIENT_ID || '76f5efc0956c4fa4867ddd8f89fc1c59',
-    clientSecret: import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || '9a585cef5d3943c8909416e28a9bb88e',
+    clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || '76f5efc0956c4fa4867ddd8f89fc1c59',
+    clientSecret: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET || '9a585cef5d3943c8909416e28a9bb88e',
     redirectUri: getSpotifyRedirectUri(),
     // User's "bruh" playlist configuration
     defaultPlaylistId: '33buJwhTwWVlKAz8wBObDL',

@@ -12,9 +12,9 @@ interface SupabaseConfig {
 const getSupabaseConfig = (): SupabaseConfig => {
   // For development, provide fallback values
   const config: SupabaseConfig = {
-    url: import.meta.env.VITE_SUPABASE_URL || 'https://qzxbinrlrzbfnqiuccon.supabase.co',
-    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6eGJpbnJscnpiZm5xaXVjY29uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyNjgxOTUsImV4cCI6MjA2Njg0NDE5NX0.Ad_UHirGqj0zn5rF7sWU0cHvVRwb0dtNwtEI76UEocY',
-    serviceRoleKey: import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qzxbinrlrzbfnqiuccon.supabase.co',
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6eGJpbnJscnpiZm5xaXVjY29uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEyNjgxOTUsImV4cCI6MjA2Njg0NDE5NX0.Ad_UHirGqj0zn5rF7sWU0cHvVRwb0dtNwtEI76UEocY',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   };
 
   // Validate required configuration

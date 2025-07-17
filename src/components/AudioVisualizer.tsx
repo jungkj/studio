@@ -174,13 +174,8 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ isOpen, onClose, curr
   return (
     <Window
       title="CD Player - Spectrum Analyzer"
-      isOpen={isOpen}
       onClose={onClose}
-      icon={windowIcon}
-      defaultWidth={600}
-      defaultHeight={400}
-      minWidth={400}
-      minHeight={300}
+      initialSize={{ width: 600, height: 400 }}
     >
       {/* Track Info with Progress */}
       <div className="px-4 py-2 bg-mac-light-gray border-b border-mac-dark-gray">

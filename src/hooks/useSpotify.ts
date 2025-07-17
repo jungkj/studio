@@ -133,9 +133,9 @@ export const useSpotify = (): UseSpotifyReturn => {
     isPollingRef.current = true;
     
     try {
-      console.log('🎵 updateCurrentTrack called - isAuthenticated:', spotifyService.isAuthenticated());
+      console.log('🎵 updateCurrentTrack called - isAuthenticated:', spotifyService.instance.isAuthenticated());
 
-      if (spotifyService.isAuthenticated()) {
+      if (spotifyService.instance.isAuthenticated()) {
         // Set loading state
         setState(prev => ({
           ...prev,
@@ -143,7 +143,7 @@ export const useSpotify = (): UseSpotifyReturn => {
           error: null,
         }));
 
-        const trackData = await spotifyService.getCurrentlyPlaying();
+        const trackData = await spotifyService.instance.getCurrentlyPlaying();
         console.log('🎵 Received track data:', trackData?.item?.name || 'No track playing');
         
         if (trackData && trackData.item) {
@@ -171,7 +171,7 @@ export const useSpotify = (): UseSpotifyReturn => {
           }
         } else {
           // No current track, try to get recently played
-          const recentlyPlayed = await spotifyService.getRecentlyPlayed(1);
+          const recentlyPlayed = await spotifyService.instance.getRecentlyPlayed(1);
           let lastPlayed = null;
           
           if (recentlyPlayed && recentlyPlayed.items.length > 0) {
@@ -337,7 +337,7 @@ export const useSpotify = (): UseSpotifyReturn => {
   // Authentication handlers
   const login = useCallback(() => {
     try {
-      const authUrl = spotifyService.getAuthUrl();
+      const authUrl = spotifyService.instance.getAuthUrl();
       console.log('🎵 Opening Spotify auth URL:', authUrl);
       
       const popup = window.open(authUrl, 'spotify-auth', 'width=600,height=700');
@@ -372,8 +372,8 @@ export const useSpotify = (): UseSpotifyReturn => {
           popup.close();
           
           // Reload tokens from localStorage and update auth state
-          spotifyService.reloadTokens();
-          const isAuth = spotifyService.isAuthenticated();
+          spotifyService.instance.reloadTokens();
+          const isAuth = spotifyService.instance.isAuthenticated();
           
           if (isAuth) {
             setState(prev => ({ ...prev, isAuthenticated: true, error: null }));
@@ -408,7 +408,7 @@ export const useSpotify = (): UseSpotifyReturn => {
   }, [startPolling]);
 
   const logout = useCallback(() => {
-    spotifyService.logout();
+    spotifyService.instance.logout();
     stopPolling();
     stopAudioAnalysis();
     stopAudio();
@@ -434,7 +434,7 @@ export const useSpotify = (): UseSpotifyReturn => {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
       // Check if already authenticated
-      const isAuth = spotifyService.isAuthenticated();
+      const isAuth = spotifyService.instance.isAuthenticated();
       if (isAuth) {
         setState(prev => ({ ...prev, isAuthenticated: true }));
         startPolling(true);
@@ -469,7 +469,7 @@ export const useSpotify = (): UseSpotifyReturn => {
       }
 
       if (code) {
-        const success = await spotifyService.handleAuthCallback(code);
+        const success = await spotifyService.instance.handleAuthCallback(code);
         
         if (success) {
           setState(prev => ({ ...prev, isAuthenticated: true, error: null }));
@@ -506,7 +506,7 @@ export const useSpotify = (): UseSpotifyReturn => {
     
          // Try to authenticate with existing tokens
      const initializeSpotify = async () => {
-       const isAuth = spotifyService.isAuthenticated();
+       const isAuth = spotifyService.instance.isAuthenticated();
        
        setState(prev => ({ ...prev, isAuthenticated: isAuth }));
        
