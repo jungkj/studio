@@ -3,7 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ToasterContextProvider } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "./providers";
-import "../src/globals.css";
+import "@/globals.css";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
