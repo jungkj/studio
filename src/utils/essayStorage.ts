@@ -157,7 +157,7 @@ export const essayStorage = {
   setAdminAuth(password: string): boolean {
     if (typeof window === 'undefined' || !window.localStorage) return false;
     // Simple password check - in production, use proper authentication
-    if (password === 'andyadmin2025') {
+    if (password === 'mimi123') {
       localStorage.setItem(ADMIN_AUTH_KEY, 'authenticated');
       return true;
     }

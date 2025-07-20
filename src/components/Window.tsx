@@ -222,15 +222,14 @@ const Window: React.FC<WindowProps> = ({
         {/* Resize Handle */}
         {!isMinimized && resizable && (
           <div
-            className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
+            className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize z-10"
             onMouseDown={handleResizeMouseDown}
-          >
-            <div className="absolute bottom-1 right-1 w-3 h-3 opacity-50">
-              <div className="absolute bottom-0 right-0 w-1 h-3 bg-mac-dark-gray"></div>
-              <div className="absolute bottom-0 right-1 w-2 h-1 bg-mac-dark-gray"></div>
-              <div className="absolute bottom-1 right-0 w-3 h-1 bg-mac-dark-gray"></div>
-            </div>
-          </div>
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 15H16V16H15V15Z' fill='%23000000'/%3E%3Cpath d='M13 15H14V16H13V15Z' fill='%23000000'/%3E%3Cpath d='M11 15H12V16H11V15Z' fill='%23000000'/%3E%3Cpath d='M15 13H16V14H15V13Z' fill='%23000000'/%3E%3Cpath d='M13 13H14V14H13V13Z' fill='%23000000'/%3E%3Cpath d='M15 11H16V12H15V11Z' fill='%23000000'/%3E%3Cpath d='M9 15H10V16H9V15Z' fill='%23666666'/%3E%3Cpath d='M11 13H12V14H11V13Z' fill='%23666666'/%3E%3Cpath d='M13 11H14V12H13V11Z' fill='%23666666'/%3E%3Cpath d='M15 9H16V10H15V9Z' fill='%23666666'/%3E%3C/svg%3E")`,
+              backgroundPosition: 'bottom right',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
         )}
       </div>
     </div>

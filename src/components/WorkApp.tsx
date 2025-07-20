@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelButton } from './PixelButton';
-import { Code, Image, ExternalLink, Briefcase } from 'lucide-react';
+import { Code, Image, ExternalLink, Briefcase, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WorkAppProps {
@@ -48,12 +48,9 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
       {/* Header */}
       <div className="bg-mac-white mac-border-inset p-4 m-4 mb-2">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Briefcase size={20} className="text-mac-black" />
-            <h1 className="text-lg font-bold text-mac-black pixel-font">My Work Portfolio</h1>
-          </div>
-          <p className="text-sm text-mac-dark-gray pixel-font">
-            Projects I've built & things I'm proud of 🛠️
+          <h1 className="text-lg font-bold text-mac-black pixel-font mb-1">My Work</h1>
+          <p className="text-xs text-mac-dark-gray pixel-font">
+            things ive built
           </p>
         </div>
       </div>
@@ -69,14 +66,14 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
               {/* Project Header */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-start gap-3 flex-1">
-                  <div className="mt-1">
-                    <project.icon size={16} className="text-mac-dark-gray" />
+                  <div className="mt-1 bg-mac-light-gray mac-border-inset p-2">
+                    <project.icon size={18} className="text-mac-black" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-sm font-bold mb-1 text-mac-black pixel-font">
+                    <h2 className="text-base font-bold mb-1 text-mac-black pixel-font">
                       {project.title}
                     </h2>
-                    <span className="text-xs text-mac-dark-gray pixel-font">
+                    <span className="text-xs text-mac-dark-gray pixel-font inline-block bg-cream-50 px-2 py-1 mac-border-outset">
                       {project.status}
                     </span>
                   </div>
@@ -86,34 +83,39 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
                     href={project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800"
+                    className="bg-mac-light-gray mac-border-outset p-2 hover:mac-border-inset transition-all"
                     title="View project"
                   >
-                    <ExternalLink size={14} />
+                    <div className="pixelated-arrow">
+                      <div className="arrow-pixel arrow-pixel-1"></div>
+                      <div className="arrow-pixel arrow-pixel-2"></div>
+                      <div className="arrow-pixel arrow-pixel-3"></div>
+                      <div className="arrow-pixel arrow-pixel-4"></div>
+                      <div className="arrow-pixel arrow-pixel-5"></div>
+                      <div className="arrow-pixel arrow-pixel-6"></div>
+                      <div className="arrow-pixel arrow-pixel-7"></div>
+                    </div>
                   </a>
                 )}
               </div>
               
               {/* Description */}
-              <div className="bg-mac-light-gray mac-border-inset p-2 mb-3">
-                <p className="text-xs leading-relaxed text-mac-black pixel-font">
+              <div className="bg-cream-25 mac-border-inset p-3 mb-3">
+                <p className="text-sm leading-relaxed text-mac-black pixel-font">
                   {project.description}
                 </p>
               </div>
               
               {/* Technologies */}
-              <div className="mb-3">
-                <span className="text-xs text-mac-dark-gray font-bold pixel-font">Technologies: </span>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {project.technologies.map((tech, techIndex) => (
-                    <span 
-                      key={techIndex} 
-                      className="bg-mac-medium-gray text-mac-black text-xs px-2 py-1 mac-border-outset pixel-font"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map((tech, techIndex) => (
+                  <span 
+                    key={techIndex} 
+                    className="bg-mac-white text-mac-black text-xs px-3 py-1 mac-border-outset pixel-font hover:bg-mac-light-gray transition-colors"
+                  >
+                    {tech}
+                  </span>
+                ))}
               </div>
             </div>
           ))}
