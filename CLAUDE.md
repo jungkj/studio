@@ -36,7 +36,9 @@ app/
 ├── layout.tsx          # Root layout with providers
 ├── page.tsx            # Home page (main desktop)
 ├── not-found.tsx       # 404 page
-└── spotifycallback/   # Spotify OAuth callback
+├── callback/           # OAuth callback route
+├── spotifycallback/    # Spotify OAuth callback
+└── test/               # Test page
 src/
 ├── components/         # UI components
 │   ├── ui/            # All shadcn/ui components (50+)
@@ -62,12 +64,19 @@ src/
    - No server-side rendering - pure client-side
    - All API calls happen client-side
    - OAuth flows handled via client-side redirects
+   - Image optimization disabled for static export
+   - Worker threads disabled in experimental config
 
 3. **Window Application Pattern**:
    - Each app extends base Window component
    - Apps stored in APPLICATIONS array in Desktop.tsx
    - Window state includes: isOpen, zIndex, position
    - Use `'use client'` directive for all components
+
+4. **TypeScript Configuration**:
+   - Strict mode intentionally disabled
+   - Additional relaxed settings: `noImplicitAny: false`, `noUnusedParameters: false`
+   - Path alias: `@/*` maps to `./src/*`
 
 ### Development Guidelines
 
@@ -80,7 +89,8 @@ src/
 
 2. **Styling**:
    - Use Tailwind CSS exclusively
-   - Custom colors: mac-[light/medium/darker/dark]-gray, apple-blue, cream-[25-900]
+   - Custom colors: mac-[light/medium/darker/dark]-gray, apple-[blue/green/red/orange/purple], cream-[25-900]
+   - HSL CSS variables for theming
    - Maintain retro Mac OS aesthetic
    - Window chrome uses specific patterns (see Window.tsx)
 
@@ -94,20 +104,23 @@ src/
    - Supabase client: utils/supabaseConfig.ts
    - Auth hook: hooks/useAuth.ts
    - Services: essayService.ts, spotifyService.ts, youtubeAudioService.ts
-   - All database tables have RLS enabled
+   - All database tables have RLS enabled with specific policies
 
 5. **Environment Variables**:
    - Client-side: NEXT_PUBLIC_ prefix required
    - Spotify: NEXT_PUBLIC_SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
    - YouTube: NEXT_PUBLIC_YOUTUBE_API_KEY
-   - Supabase (optional): NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - Supabase: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ### Database Schema (Supabase)
 - `profiles`: User profiles (extends auth.users)
-- `projects`: Portfolio items with status tracking
-- `essays`: Blog posts with markdown support
-- `categories`: Taxonomy system
-- `comments`: Nested comments with moderation
+- `projects`: Portfolio items with `project_status` enum
+- `essays`: Blog posts with markdown support, auto-generated slugs, reading time
+- `categories`: Taxonomy system with default values
+- `comments`: Nested comments with moderation flags
+- Custom types: `project_status` (Active, Completed, On Hold, Cancelled), `priority_level`
+- Database functions: auto slug generation, reading time calculation
+- Comprehensive indexing including GIN indexes for arrays
 
 ### Common Tasks
 
@@ -117,9 +130,10 @@ src/
 3. Follow existing patterns for window management
 
 **Working with Supabase**:
-- Check SUPABASE_SETUP.md for schema details
+- Check SUPABASE_SETUP.md for complete schema details
 - Use row-level security for all queries
 - Handle auth state with useAuth hook
+- Admin role has full access, authenticated users have limited access
 
 **Spotify Integration**:
 - Setup guide: SPOTIFY_SETUP.md
@@ -128,13 +142,18 @@ src/
 - OAuth flow through /spotifycallback route
 - Redirect URI must use 127.0.0.1, not localhost
 
+**Data Seeding**:
+- Use `scripts/seedEssays.ts` for seeding essay data
+- Default categories pre-configured in database
+
 ### Important Notes
 - Static export configured (`output: 'export'`)
 - No server-side rendering - client-side only
 - Desktop metaphor - apps open as windows, not routes
 - Audio features require user interaction to start (browser security)
-- TypeScript strict mode is disabled (`strict: false` in tsconfig.json)
+- TypeScript strict mode is disabled with additional relaxed settings
 - Path alias configured: `@/*` maps to `./src/*`
+- Optimized for Vercel deployment with trailing slashes enabled
 
 ### Essay Quotes
 To add a quote at the top of an essay, start the content with:
