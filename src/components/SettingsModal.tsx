@@ -197,7 +197,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
               <div className="mac-border-outset p-3 hover:bg-mac-light-gray transition-colors">
                 <button 
                   onClick={async () => {
-                    const authUrl = await spotifyService.getAuthUrl();
+                    const authUrl = await spotifyService.instance.getAuthUrl();
                     window.open(authUrl, '_blank', 'width=500,height=600');
                   }}
                   className="w-full text-left flex items-center space-x-3"
