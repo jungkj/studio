@@ -1,4 +1,4 @@
-import { supabase } from './supabaseConfig';
+import { getSupabaseClient } from './supabaseConfig';
 
 class SpotifyTokenService {
   private static instance: SpotifyTokenService;
@@ -17,6 +17,7 @@ class SpotifyTokenService {
    */
   async storeRefreshToken(refreshToken: string): Promise<{ success: boolean; error?: string }> {
     try {
+      const supabase = getSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -50,6 +51,7 @@ class SpotifyTokenService {
    */
   async getAdminRefreshToken(): Promise<string | null> {
     try {
+      const supabase = getSupabaseClient();
       // Get the admin user's refresh token
       // You'll need to replace this with your actual admin user ID
       const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID;
@@ -93,6 +95,7 @@ class SpotifyTokenService {
    */
   async hasRefreshToken(): Promise<boolean> {
     try {
+      const supabase = getSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) return false;

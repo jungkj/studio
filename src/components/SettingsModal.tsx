@@ -375,7 +375,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   className="flex items-center space-x-2"
                   onClick={() => setIsAdminMode(true)}
                 >
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Admin Panel</span>
                 </PixelButton>
               )}
