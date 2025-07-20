@@ -123,7 +123,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
       e.preventDefault();
       const { error } = await handleAuthSubmit(email, password);
       if (error) {
-        setAuthError(error);
+        setAuthError(error.message || 'Authentication failed');
       }
     };
 
