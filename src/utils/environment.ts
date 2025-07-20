@@ -13,25 +13,25 @@ export const getSpotifyRedirectUri = (): string => {
     
     // If hostname contains ngrok, use the current origin
     if (hostname.includes('ngrok.io') || hostname.includes('ngrok-free.app')) {
-      return `${window.location.origin}/callback`;
+      return `${window.location.origin}/spotifycallback`;
     }
     
     // For localhost/127.0.0.1 or any local IP, always use 127.0.0.1 for consistency
     // This ensures all local addresses (localhost, 127.0.0.1, 192.168.x.x) use the same redirect URI
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname.startsWith('172.')) {
-      const detectedPort = port || '8080'; // fallback to 8080 if port is empty
+      const detectedPort = port || '3000'; // fallback to 3000 if port is empty
       console.log('🎵 Detected port:', detectedPort, 'from location:', window.location.href);
       console.log('🎵 Using 127.0.0.1 for redirect URI (Spotify requirement for consistency)');
       console.log('🎵 Note: Access your site at http://127.0.0.1:' + detectedPort, 'for best Spotify compatibility');
-      return `http://127.0.0.1:${detectedPort}/callback`;
+      return `http://127.0.0.1:${detectedPort}/spotifycallback`;
     }
     
     // If we're on a custom domain, use that
-    return `${window.location.origin}/callback`;
+    return `${window.location.origin}/spotifycallback`;
   }
 
   // Fallback for SSR (shouldn't be used in practice)
-  return 'http://127.0.0.1:8080/callback';
+  return 'http://127.0.0.1:3000/spotifycallback';
 };
 
 export const getSpotifyConfig = () => {
@@ -46,6 +46,7 @@ export const getSpotifyConfig = () => {
     scopes: [
       'user-read-currently-playing',
       'user-read-playback-state',
+      'user-read-playback-position',
       'user-modify-playback-state',
       'user-read-recently-played',
       'playlist-read-private',

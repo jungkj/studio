@@ -15,22 +15,22 @@ Set these in your Vercel project settings:
 
 ```bash
 # Spotify (get from https://developer.spotify.com/dashboard)
-VITE_SPOTIFY_CLIENT_ID=your_spotify_client_id
-VITE_SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-VITE_SPOTIFY_REDIRECT_URI=https://your-domain.vercel.app/callback
-VITE_SPOTIFY_DEFAULT_PLAYLIST_ID=your_playlist_id
-VITE_SPOTIFY_DEFAULT_PLAYLIST_URI=spotify:playlist:your_playlist_id
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=https://your-domain.vercel.app/spotifycallback
+NEXT_PUBLIC_SPOTIFY_DEFAULT_PLAYLIST_ID=your_playlist_id
+NEXT_PUBLIC_SPOTIFY_DEFAULT_PLAYLIST_URI=spotify:playlist:your_playlist_id
 
 # YouTube (get from https://console.cloud.google.com)
-VITE_YOUTUBE_API_KEY=your_youtube_api_key
+NEXT_PUBLIC_YOUTUBE_API_KEY=your_youtube_api_key
 ```
 
 ### Optional Variables
 
 ```bash
 # Supabase (if using backend features)
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ## Deployment Steps
@@ -39,9 +39,10 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 1. Go to https://developer.spotify.com/dashboard
 2. Create or select your app
-3. Add your production redirect URI:
-   - `https://your-domain.vercel.app/callback`
-   - Keep `http://localhost:8080/callback` for local development
+3. Add your redirect URIs:
+   - Production: `https://your-domain.vercel.app/spotifycallback`
+   - Local development: `http://127.0.0.1:3000/spotifycallback`
+   - Note: Spotify doesn't allow `localhost` or dashes in paths, use `127.0.0.1` instead
 
 ### 2. Deploy to Vercel
 

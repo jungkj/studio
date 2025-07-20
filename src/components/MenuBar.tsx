@@ -312,7 +312,6 @@ const MenuBar: React.FC<MenuBarProps> = ({
           </div>
         </div>
       </div>
-      <div className="apple-accent"></div>
     </div>
   );
 };

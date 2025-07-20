@@ -266,6 +266,42 @@ class SpotifyService {
     return true;
   }
 
+  public async getPlaybackState(): Promise<any | null> {
+    if (!(await this.ensureValidToken())) {
+      console.warn('🎵 No valid token for getPlaybackState');
+      return null;
+    }
+
+    try {
+      const response = await fetch('https://api.spotify.com/v1/me/player', {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+        },
+      });
+
+      if (response.status === 204) {
+        console.log('🎵 No active playback device');
+        return null;
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🎵 Playback state:', {
+          isPlaying: data.is_playing,
+          device: data.device?.name,
+          track: data.item?.name
+        });
+        return data;
+      } else {
+        console.error('🎵 Error fetching playback state:', response.status, response.statusText);
+        return null;
+      }
+    } catch (error) {
+      console.error('🎵 Error fetching playback state:', error);
+      return null;
+    }
+  }
+
   public async getCurrentlyPlaying(): Promise<SpotifyCurrentlyPlaying | null> {
     if (!(await this.ensureValidToken())) {
       console.warn('🎵 No valid token for getCurrentlyPlaying');
@@ -273,6 +309,18 @@ class SpotifyService {
     }
 
     try {
+      // First try the full playback state endpoint which is more reliable
+      const playbackState = await this.getPlaybackState();
+      if (playbackState && playbackState.item) {
+        return {
+          item: playbackState.item,
+          is_playing: playbackState.is_playing,
+          progress_ms: playbackState.progress_ms,
+          currently_playing_type: playbackState.currently_playing_type || 'track'
+        };
+      }
+
+      // Fallback to currently-playing endpoint
       const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,

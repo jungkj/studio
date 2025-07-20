@@ -8,7 +8,8 @@ const MacLoadingScreen: React.FC<MacLoadingScreenProps> = ({ onLoadingComplete }
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState('');
   const [isComplete, setIsComplete] = useState(false);
-  const [showCursor, setShowCursor] = useState(true);
+  const [showCursor, setShowCursor] = useState(false);
+  const [activeDot, setActiveDot] = useState(0);
 
   const bootMessages = [
     "System 7.5.3 starting up...",
@@ -27,6 +28,15 @@ const MacLoadingScreen: React.FC<MacLoadingScreenProps> = ({ onLoadingComplete }
     }, 500);
 
     return () => clearInterval(cursorInterval);
+  }, []);
+
+  // Loading dots animation
+  useEffect(() => {
+    const dotsInterval = setInterval(() => {
+      setActiveDot(prev => (prev + 1) % 3);
+    }, 400);
+
+    return () => clearInterval(dotsInterval);
   }, []);
 
   // Loading progress
@@ -129,7 +139,7 @@ const MacLoadingScreen: React.FC<MacLoadingScreenProps> = ({ onLoadingComplete }
                       <span
                         key={i}
                         className={`text-green-400 transition-opacity duration-500 ${
-                          Math.floor(Date.now() / 400) % 3 === i ? 'opacity-100' : 'opacity-30'
+                          activeDot === i ? 'opacity-100' : 'opacity-30'
                         }`}
                       >
                         ●
@@ -189,4 +199,4 @@ const MacLoadingScreen: React.FC<MacLoadingScreenProps> = ({ onLoadingComplete }
   );
 };
 
-export { MacLoadingScreen }; 
+export { MacLoadingScreen };

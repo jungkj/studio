@@ -1,30 +1,52 @@
-import React, { useState } from 'react';
-import { Folder, Volume2, HardDrive, Monitor, Settings, Network, Printer, Music } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Folder, Volume2, HardDrive, Monitor, Settings, Network, Printer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PixelButton } from './PixelButton';
-import { SpotifyDisplay } from './SpotifyDisplay';
+import { SpotifyNowPlaying } from './SpotifyNowPlaying';
 import { SettingsModal } from './SettingsModal';
-import { useSpotify } from '@/hooks/useSpotify';
 import { Clock } from './Clock';
-import { logSpotifyConfig } from '@/utils/environment';
-import { SpotifyCurrentlyPlaying } from '@/utils/spotifyService';
+
+interface OpenWindow {
+  name: string;
+  title: string;
+  icon?: string;
+}
 
 const SystemTray: React.FC = () => {
   const [volumeLevel, setVolumeLevel] = useState(75);
   const [showSettings, setShowSettings] = useState(false);
-  const {
-    currentTrack,
-    lastPlayedTrack,
-    isLoading,
-    error,
-    login: spotifyLogin,
-    logout: spotifyLogout,
-    // Browser audio state
-    isPlaying: audioBrowserPlaying,
-    currentTime,
-    duration,
-    playPreview,
-  } = useSpotify();
+  const [openWindows, setOpenWindows] = useState<OpenWindow[]>([]);
+
+  // Listen for window open/close events from Desktop
+  useEffect(() => {
+    const handleWindowOpen = (event: CustomEvent<OpenWindow>) => {
+      setOpenWindows(prev => {
+        // Prevent duplicates
+        if (prev.some(w => w.name === event.detail.name)) {
+          return prev;
+        }
+        return [...prev, event.detail];
+      });
+    };
+
+    const handleWindowClose = (event: CustomEvent<{ name: string }>) => {
+      setOpenWindows(prev => prev.filter(w => w.name !== event.detail.name));
+    };
+
+    const handleWindowFocus = (event: CustomEvent<{ name: string }>) => {
+      // Could implement visual indication of focused window
+    };
+
+    window.addEventListener('windowOpen' as any, handleWindowOpen);
+    window.addEventListener('windowClose' as any, handleWindowClose);
+    window.addEventListener('windowFocus' as any, handleWindowFocus);
+
+    return () => {
+      window.removeEventListener('windowOpen' as any, handleWindowOpen);
+      window.removeEventListener('windowClose' as any, handleWindowClose);
+      window.removeEventListener('windowFocus' as any, handleWindowFocus);
+    };
+  }, []);
 
   const handleVolumeClick = () => {
     const newLevel = volumeLevel > 0 ? 0 : 75;
@@ -60,22 +82,14 @@ const SystemTray: React.FC = () => {
     setShowSettings(true);
   };
 
-  const handleSpotifyClick = () => {
-    if (currentTrack) {
-      // Show context menu or additional actions
-      console.log('Current track:', currentTrack.item?.name);
-    } else {
-      // Log current configuration for debugging
-      logSpotifyConfig();
-      console.log('Connecting to Spotify...');
-      spotifyLogin();
-    }
+  const handleTaskbarItemClick = (windowName: string) => {
+    // Dispatch event to focus window
+    window.dispatchEvent(new CustomEvent('focusWindow', { detail: { name: windowName } }));
   };
 
-  const handlePlayPreview = (trackData: SpotifyCurrentlyPlaying) => {
-    if (trackData.item) {
-      playPreview(trackData.item);
-    }
+  const handleCloseFromTaskbar = (windowName: string) => {
+    // Dispatch event to close window
+    window.dispatchEvent(new CustomEvent('closeWindowFromTaskbar', { detail: { name: windowName } }));
   };
 
   return (
@@ -127,59 +141,51 @@ const SystemTray: React.FC = () => {
         >
           <Printer size={18} />
         </PixelButton>
+
+        {/* Separator */}
+        <div className="w-px h-8 bg-mac-dark-gray mx-2" />
+
+        {/* Open Applications (Taskbar) */}
+        {openWindows.map((window, index) => (
+          <div
+            key={`${window.name}-${index}`}
+            className="h-8 px-2 flex items-center bg-mac-white mac-border-outset hover:bg-mac-light-gray transition-colors min-w-0 max-w-[150px] cursor-pointer"
+            onClick={() => handleTaskbarItemClick(window.name)}
+            title={window.title}
+          >
+            {window.icon && (
+              <span className="mr-1 text-xs">{window.icon}</span>
+            )}
+            <span className="text-xs mac-system-font truncate">{window.title}</span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCloseFromTaskbar(window.name);
+              }}
+              className="ml-2 text-xs hover:text-red-600 flex-shrink-0 p-0 border-0 bg-transparent cursor-pointer"
+              title={`Close ${window.title}`}
+            >
+              ×
+            </span>
+          </div>
+        ))}
       </div>
 
-      {/* Center: Spotify Display */}
-      <div className="flex-1 flex items-center justify-center px-3 min-w-0">
-        <div className="flex items-center space-x-2 max-w-md w-full">
-          <PixelButton
-            variant="secondary"
-            className={cn(
-              "w-8 h-8 p-0 flex items-center justify-center hover:bg-mac-medium-gray transition-colors flex-shrink-0",
-              currentTrack && "bg-green-100 hover:bg-green-200"
-            )}
-            onClick={handleSpotifyClick}
-            title={
-              currentTrack 
-                ? "Toggle Spotify demo mode" 
-                : "Connect to Spotify"
-            }
-          >
-            <Music size={18} className={currentTrack ? "text-green-600" : ""} />
-          </PixelButton>
-          
-          <div className="flex-1 min-w-0">
-            <SpotifyDisplay
-              currentTrack={currentTrack}
-              cachedTrack={lastPlayedTrack}
-              isLoading={isLoading}
-              error={error}
-              demoMode={false}
-              onPlayCached={() => {}}
-              className="w-full"
-              // Browser audio state
-              isPlaying={audioBrowserPlaying}
-              currentTime={currentTime}
-              duration={duration}
-              onPlayPreview={handlePlayPreview}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Center spacer */}
+      <div className="flex-1" />
 
       {/* Right side: System controls and clock */}
       <div className="flex items-center space-x-1 h-full">
+        {/* Spotify Now Playing */}
+        <SpotifyNowPlaying className="mr-2" />
         {/* Volume control */}
         <PixelButton 
           variant="secondary" 
-          className={cn(
-            "w-8 h-8 p-0 flex items-center justify-center hover:bg-mac-medium-gray transition-colors",
-            !currentTrack && "bg-mac-dark-gray text-mac-white"
-          )}
+          className="w-8 h-8 p-0 flex items-center justify-center hover:bg-mac-medium-gray transition-colors"
           onClick={handleVolumeClick}
-          title={`Volume: ${currentTrack ? "Playing" : "Muted"}`}
+          title={`Volume: ${volumeLevel}%`}
         >
-          <Volume2 size={18} />
+          <Volume2 size={18} className={volumeLevel === 0 ? 'text-mac-dark-gray' : ''} />
         </PixelButton>
 
         {/* Settings */}

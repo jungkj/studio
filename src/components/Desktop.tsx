@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
 import { AboutApp } from '@/components/AboutApp';
@@ -12,7 +12,6 @@ import { SudokuGame } from '@/components/SudokuGame';
 import { SolitaireGame } from '@/components/SolitaireGame';
 import { ContactApp } from '@/components/ContactApp';
 import { WorkApp } from '@/components/WorkApp';
-import { TerminalApp } from '@/components/TerminalApp';
 import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
@@ -21,15 +20,46 @@ import { MacLoadingScreen } from '@/components/MacLoadingScreen';
 import { Clock } from '@/components/Clock';
 import { SettingsModal } from '@/components/SettingsModal';
 import { SimpleCalculator } from '@/components/SimpleCalculator';
-import { SpotifyAudioVisualizer } from '@/components/SpotifyAudioVisualizer';
 import { useToast } from '@/components/ui/use-toast';
 
-type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'terminal' | 'welcome' | 'clock' | 'calculator' | 'spotifyVisualizer';
+type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'ticTacToe' | 'snake' | 'sudoku' | 'solitaire' | 'contact' | 'work' | 'welcome' | 'clock' | 'calculator';
 
 interface WindowState {
   isOpen: boolean;
   zIndex: number;
 }
+
+const windowTitles: Record<WindowName, string> = {
+  essays: 'My Essays',
+  about: 'About Me',
+  myComputer: 'My Computer',
+  gamesLauncher: 'Games Launcher',
+  ticTacToe: 'Tic-Tac-Toe',
+  snake: 'Snake',
+  sudoku: 'Sudoku',
+  solitaire: 'Solitaire',
+  contact: 'Contact Me',
+  work: 'My Work',
+  welcome: 'Welcome',
+  clock: 'Clock',
+  calculator: 'Calculator',
+};
+
+const windowIcons: Record<WindowName, string> = {
+  essays: '📄',
+  about: '👤',
+  myComputer: '💻',
+  gamesLauncher: '🎮',
+  ticTacToe: '❌',
+  snake: '🐍',
+  sudoku: '🔢',
+  solitaire: '🃏',
+  contact: '📧',
+  work: '📁',
+  welcome: '👋',
+  clock: '🕐',
+  calculator: '🧮',
+};
 
 const Index = () => {
   const { toast } = useToast();
@@ -46,30 +76,118 @@ const Index = () => {
     solitaire: { isOpen: false, zIndex: 17 },
     contact: { isOpen: false, zIndex: 18 },
     work: { isOpen: false, zIndex: 19 },
-    terminal: { isOpen: false, zIndex: 20 },
     welcome: { isOpen: false, zIndex: 21 }, // Start closed until loading completes
     clock: { isOpen: false, zIndex: 22 },
     calculator: { isOpen: false, zIndex: 23 },
-    spotifyVisualizer: { isOpen: false, zIndex: 24 },
   });
 
   const [maxZIndex, setMaxZIndex] = useState(24);
   const [showSettings, setShowSettings] = useState(false);
+  const prevWindowStatesRef = useRef<Record<WindowName, WindowState>>(windowStates);
+
+  // Emit window events when states change
+  useEffect(() => {
+    const prevStates = prevWindowStatesRef.current;
+    
+    // Check for newly opened windows
+    Object.keys(windowStates).forEach((windowName) => {
+      const key = windowName as WindowName;
+      if (windowStates[key].isOpen && !prevStates[key].isOpen) {
+        window.dispatchEvent(new CustomEvent('windowOpen', {
+          detail: {
+            name: key,
+            title: windowTitles[key],
+            icon: windowIcons[key],
+          }
+        }));
+      }
+      // Check for closed windows
+      else if (!windowStates[key].isOpen && prevStates[key].isOpen) {
+        window.dispatchEvent(new CustomEvent('windowClose', {
+          detail: { name: key }
+        }));
+      }
+    });
+    
+    prevWindowStatesRef.current = windowStates;
+  }, [windowStates]);
+
+  // Listen for taskbar events
+  React.useEffect(() => {
+    const handleFocusWindow = (event: Event) => {
+      const customEvent = event as CustomEvent<{ name: string }>;
+      const windowName = customEvent.detail.name as WindowName;
+      setWindowStates(prev => {
+        if (!prev[windowName]?.isOpen) return prev;
+        
+        const currentZIndex = prev[windowName].zIndex;
+        if (currentZIndex === maxZIndex) return prev;
+        
+        const newMaxZIndex = maxZIndex + 1;
+        setMaxZIndex(newMaxZIndex);
+        
+        window.dispatchEvent(new CustomEvent('windowFocus', {
+          detail: { name: windowName }
+        }));
+        
+        return {
+          ...prev,
+          [windowName]: { ...prev[windowName], zIndex: newMaxZIndex },
+        };
+      });
+    };
+
+    const handleCloseFromTaskbar = (event: Event) => {
+      const customEvent = event as CustomEvent<{ name: string }>;
+      const windowName = customEvent.detail.name as WindowName;
+      setWindowStates(prev => {
+        if (!prev[windowName]?.isOpen) return prev;
+        
+        window.dispatchEvent(new CustomEvent('windowClose', {
+          detail: { name: windowName }
+        }));
+        
+        return {
+          ...prev,
+          [windowName]: { ...prev[windowName], isOpen: false },
+        };
+      });
+    };
+
+    window.addEventListener('focusWindow', handleFocusWindow);
+    window.addEventListener('closeWindowFromTaskbar', handleCloseFromTaskbar);
+
+    return () => {
+      window.removeEventListener('focusWindow', handleFocusWindow);
+      window.removeEventListener('closeWindowFromTaskbar', handleCloseFromTaskbar);
+    };
+  }, [maxZIndex]);
 
   const handleLoadingComplete = () => {
     setIsLoading(false);
     // Open welcome window after loading
+    const newMaxZIndex = maxZIndex + 1;
     setWindowStates(prev => ({
       ...prev,
-      welcome: { isOpen: true, zIndex: maxZIndex + 1 }
+      welcome: { isOpen: true, zIndex: newMaxZIndex }
     }));
-    setMaxZIndex(prev => prev + 1);
+    setMaxZIndex(newMaxZIndex);
+    
+    // Emit window open event for welcome window
+    window.dispatchEvent(new CustomEvent('windowOpen', {
+      detail: {
+        name: 'welcome',
+        title: 'Welcome',
+      }
+    }));
   };
+
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
       const newMaxZIndex = maxZIndex + 1;
       setMaxZIndex(newMaxZIndex);
+      
       return {
         ...prev,
         [windowName]: { isOpen: true, zIndex: newMaxZIndex },
@@ -92,6 +210,12 @@ const Index = () => {
       }
       const newMaxZIndex = maxZIndex + 1;
       setMaxZIndex(newMaxZIndex);
+      
+      // Emit window focus event for taskbar
+      window.dispatchEvent(new CustomEvent('windowFocus', {
+        detail: { name: windowName }
+      }));
+      
       return {
         ...prev,
         [windowName]: { ...prev[windowName], zIndex: newMaxZIndex },
@@ -107,10 +231,8 @@ const Index = () => {
     { name: 'work', label: 'My Work', icon: 'Be-Os-Be-Box-Be-Folder.32.png', fallback: 'folder' as const },
     { name: 'essays', label: 'My Essays', icon: 'Be-Os-Be-Box-Be-Card-Stack.32.png', fallback: 'document' as const },
     { name: 'gamesLauncher', label: 'Games', icon: 'Be-Os-Be-Box-Be-Play.32.png', fallback: 'game' as const },
-    { name: 'terminal', label: 'Terminal', icon: 'Be-Os-Be-Box-Be-Hello-World.32.png', fallback: 'terminal' as const },
     { name: 'contact', label: 'Contact', icon: 'Be-Os-Be-Box-Be-Mail-2.32.png', fallback: 'mail' as const },
     { name: 'about', label: 'About Me', icon: 'Be-Os-Be-Box-Be-Sound.32.png', fallback: 'user' as const },
-    { name: 'spotifyVisualizer', label: 'Spotify Visualizer', icon: 'Be-Os-Be-Box-Be-Sound.32.png', fallback: 'user' as const },
   ];
 
   // Show loading screen first
@@ -286,18 +408,6 @@ const Index = () => {
             <WorkApp onClose={() => closeWindow('work')} />
           </Window>
         )}
-        {windowStates.terminal.isOpen && (
-          <Window 
-            title="Terminal" 
-            onClose={() => closeWindow('terminal')} 
-            initialPosition={{ x: 80, y: 70 }} 
-            initialSize={{ width: 900, height: 600 }}
-            zIndex={windowStates.terminal.zIndex} 
-            onFocus={() => focusWindow('terminal')}
-          >
-            <TerminalApp onClose={() => closeWindow('terminal')} />
-          </Window>
-        )}
         {windowStates.clock.isOpen && (
           <Window 
             title="Clock" 
@@ -323,12 +433,6 @@ const Index = () => {
           >
             <SimpleCalculator onClose={() => closeWindow('calculator')} />
           </Window>
-        )}
-        {windowStates.spotifyVisualizer.isOpen && (
-          <SpotifyAudioVisualizer 
-            isOpen={windowStates.spotifyVisualizer.isOpen}
-            onClose={() => closeWindow('spotifyVisualizer')}
-          />
         )}
       </div>
 
