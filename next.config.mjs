@@ -6,12 +6,13 @@ const nextConfig = {
     domains: [],
     unoptimized: true,
   },
-  // Remove trailing slash for static export
-  trailingSlash: false,
-  // Ensure proper static file generation
-  generateBuildId: async () => {
-    return 'build'
-  },
+  // Add trailing slash for better static site compatibility
+  trailingSlash: true,
+  // Disable image optimization for static export
+  experimental: {
+    workerThreads: false,
+    cpus: 1
+  }
 }
 
 export default nextConfig
