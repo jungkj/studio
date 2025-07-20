@@ -316,7 +316,7 @@ class SpotifyService {
           item: playbackState.item,
           is_playing: playbackState.is_playing,
           progress_ms: playbackState.progress_ms,
-          currently_playing_type: playbackState.currently_playing_type || 'track'
+          timestamp: Date.now()
         };
       }
 
