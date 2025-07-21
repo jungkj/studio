@@ -7,6 +7,7 @@ import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
 import { SeedEssaysButton } from './SeedEssaysButton';
 import { MigrateEssaysButton } from './MigrateEssaysButton';
+import { UploadPlaceholderEssaysButton } from './UploadPlaceholderEssaysButton';
 import { checkSupabaseConnection } from '@/utils/supabaseConfig';
 
 interface EssaysAppProps {
@@ -320,8 +321,9 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         {/* Admin controls */}
         {isAdmin && isAdminMode && (
           <div className="mt-3 pt-3 border-t border-mac-medium-gray space-y-3">
-            <SeedEssaysButton />
+            <UploadPlaceholderEssaysButton onComplete={refreshEssays} />
             <MigrateEssaysButton />
+            <SeedEssaysButton />
           </div>
         )}
       </div>

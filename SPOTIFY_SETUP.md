@@ -17,27 +17,21 @@ As of 2025, Spotify has changed their redirect URI requirements:
 - **Client Secret**: `9a585cef5d3943c8909416e28a9bb88e`
 - **Redirect URI**: `http://127.0.0.1:8080/callback` (Updated for Spotify requirements)
 
-## 🔧 Spotify App Settings (HTTPS Required)
+## 🔧 Spotify App Settings
 
-Spotify now requires HTTPS for redirect URIs. Here are two options:
+### For Production (Vercel)
 
-### Option A: Using ngrok (Recommended)
+1. **Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)**
+2. **Find your app** (Client ID: 76f5efc0956c4fa4867ddd8f89fc1c59)
+3. **Click "Edit Settings"**
+4. **Add this EXACT Redirect URI**: `https://studio-andy.vercel.app/spotifycallback`
+5. **Save changes**
 
-1. **Install ngrok**: `brew install ngrok` (Mac) or download from https://ngrok.com/download
-2. **Start your app**: `npm run dev`
-3. **In another terminal**: `ngrok http 8082`
-4. **Copy the HTTPS URL** (e.g., `https://abc123.ngrok.io`)
-5. **Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)**
-6. **Find your app** (Client ID: 76f5efc0956c4fa4867ddd8f89fc1c59)
-7. **Click "Edit Settings"**
-8. **Add Redirect URI**: `https://YOUR_NGROK_URL.ngrok.io/callback`
-9. **Save changes**
+### For Local Development
 
-### Option B: Use Required Loopback IP (Recommended for Most Users)
-
-Spotify now requires loopback IP instead of localhost:
-- ✅ **Use this**: `http://127.0.0.1:8080/callback`
-- ❌ **Don't use**: `http://localhost:8080/callback` (no longer allowed)
+Spotify requires specific redirect URI formats:
+- ✅ **Use this**: `http://127.0.0.1:3000/spotifycallback`
+- ❌ **Don't use**: `http://localhost:3000/spotifycallback` (no longer allowed)
 
 ## 🚀 Quick Start Guide
 

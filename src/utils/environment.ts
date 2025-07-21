@@ -11,6 +11,12 @@ export const getSpotifyRedirectUri = (): string => {
     const hostname = window.location.hostname;
     const port = window.location.port;
     
+    // For Vercel deployments
+    if (hostname.includes('vercel.app') || hostname.includes('vercel.sh')) {
+      // Use the specific Vercel URL
+      return `https://studio-andy.vercel.app/spotifycallback`;
+    }
+    
     // If hostname contains ngrok, use the current origin
     if (hostname.includes('ngrok.io') || hostname.includes('ngrok-free.app')) {
       return `${window.location.origin}/spotifycallback`;
