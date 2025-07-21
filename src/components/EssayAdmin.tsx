@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Essay, essayStorage } from '@/utils/essayStorage';
+import React, { useState, useEffect } from 'react';
+import { Essay as LocalEssay, essayStorage } from '@/utils/essayStorage';
+import { Essay as SupabaseEssay } from '@/utils/supabaseTypes';
+import { essayService } from '@/utils/essayService';
 import { PixelButton } from './PixelButton';
+import { MigrateEssaysButton } from './MigrateEssaysButton';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Dialog,
   DialogContent,
@@ -14,8 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
 interface EssayAdminProps {
-  essays: Essay[];
-  onEssaysChange: (essays: Essay[]) => void;
+  essays: SupabaseEssay[];
+  onEssaysChange: (essays: SupabaseEssay[]) => void;
   onClose: () => void;
 }
 

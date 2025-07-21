@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, Edit, LogIn, LogOut, Calendar, Clock } from 'lucide-react';
+import { BookOpen, Edit, LogIn, LogOut, Calendar, Clock, RefreshCw } from 'lucide-react';
 import { PixelButton } from './PixelButton';
 import { essayService } from '@/utils/essayService';
 import { useAuth } from '@/hooks/useAuth';
 import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
 import { SeedEssaysButton } from './SeedEssaysButton';
+import { MigrateEssaysButton } from './MigrateEssaysButton';
 import { checkSupabaseConnection } from '@/utils/supabaseConfig';
 
 interface EssaysAppProps {
@@ -47,23 +48,33 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
           return;
         }
         
-        const { data, error } = await essayService.getPublishedEssays({
+        const { data, error, count } = await essayService.getPublishedEssays({
           limit: 50,
           orderBy: 'published_at',
           ascending: false
         });
 
-        console.log('📚 Essays response:', { data, error, count: data?.length });
+        console.log('📚 Essays response:', { 
+          dataLength: data?.length || 0, 
+          totalCount: count,
+          error,
+          firstEssay: data?.[0]?.title
+        });
 
         if (error) {
           console.error('❌ Error from Supabase:', error);
-          setError(error);
+          setError(`Database error: ${error}`);
+        } else if (!data || data.length === 0) {
+          console.log('📭 No essays found in database');
+          setEssays([]);
+          // Don't show error, just empty state
         } else {
           console.log(`✅ Successfully loaded ${data.length} essays`);
           setEssays(data);
         }
       } catch (err) {
-        setError('Failed to load essays. Please try again later.');
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Failed to load essays: ${errorMessage}`);
         console.error('❌ Exception loading essays:', err);
       } finally {
         setIsLoading(false);
@@ -72,6 +83,37 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
 
     loadEssays();
   }, []);
+
+  // Refresh essays
+  const refreshEssays = () => {
+    const loadEssays = async () => {
+      console.log('🔄 Refreshing essays...');
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const { data, error, count } = await essayService.getPublishedEssays({
+          limit: 50,
+          orderBy: 'published_at',
+          ascending: false
+        });
+
+        if (error) {
+          setError(`Database error: ${error}`);
+        } else {
+          setEssays(data || []);
+          console.log(`✅ Refreshed: ${data?.length || 0} essays`);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Failed to refresh: ${errorMessage}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadEssays();
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -232,6 +274,14 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
           <div className="flex items-center gap-2">
             <BookOpen size={20} className="text-mac-black" />
             <h1 className="text-lg font-bold text-mac-black">My Essays</h1>
+            <PixelButton
+              onClick={refreshEssays}
+              className="text-xs px-2 py-1"
+              title="Refresh essays"
+              disabled={isLoading}
+            >
+              <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+            </PixelButton>
           </div>
           
           {/* Auth controls */}
@@ -269,8 +319,9 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         
         {/* Admin controls */}
         {isAdmin && isAdminMode && (
-          <div className="mt-3 pt-3 border-t border-mac-medium-gray">
+          <div className="mt-3 pt-3 border-t border-mac-medium-gray space-y-3">
             <SeedEssaysButton />
+            <MigrateEssaysButton />
           </div>
         )}
       </div>
