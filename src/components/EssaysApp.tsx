@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
 import { SeedEssaysButton } from './SeedEssaysButton';
+import { checkSupabaseConnection } from '@/utils/supabaseConfig';
 
 interface EssaysAppProps {
   onClose: () => void;
@@ -32,24 +33,38 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
   // Load essays
   useEffect(() => {
     const loadEssays = async () => {
+      console.log('🔍 Starting to load essays...');
       setIsLoading(true);
       setError(null);
       
       try {
+        // First check if we can connect to Supabase
+        const isConnected = await checkSupabaseConnection();
+        console.log('🔌 Supabase connection status:', isConnected);
+        
+        if (!isConnected) {
+          setError('Unable to connect to database. Please check your connection.');
+          return;
+        }
+        
         const { data, error } = await essayService.getPublishedEssays({
           limit: 50,
           orderBy: 'published_at',
           ascending: false
         });
 
+        console.log('📚 Essays response:', { data, error, count: data?.length });
+
         if (error) {
+          console.error('❌ Error from Supabase:', error);
           setError(error);
         } else {
+          console.log(`✅ Successfully loaded ${data.length} essays`);
           setEssays(data);
         }
       } catch (err) {
-        setError('Failed to load essays');
-        console.error('Error loading essays:', err);
+        setError('Failed to load essays. Please try again later.');
+        console.error('❌ Exception loading essays:', err);
       } finally {
         setIsLoading(false);
       }

@@ -24,6 +24,8 @@ interface EssayFormData {
   date: string;
   readTime: string;
   preview: string;
+  quote: string;
+  quoteAuthor: string;
   content: string;
   tags: string;
 }
@@ -42,6 +44,8 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
     }),
     readTime: '',
     preview: '',
+    quote: '',
+    quoteAuthor: '',
     content: '',
     tags: ''
   });
@@ -56,6 +60,8 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
       }),
       readTime: '',
       preview: '',
+      quote: '',
+      quoteAuthor: '',
       content: '',
       tags: ''
     });
@@ -69,12 +75,29 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
 
   const handleEdit = (essay: Essay) => {
     setEditingEssay(essay);
+    
+    // Extract quote from content if it starts with quote syntax
+    let quote = '';
+    let quoteAuthor = '';
+    let content = essay.content;
+    
+    // Check for quote at the beginning of content
+    const quoteMatch = content.match(/^>\s*"([^"]+)"(?:\s*-\s*(.+))?$/m);
+    if (quoteMatch) {
+      quote = quoteMatch[1];
+      quoteAuthor = quoteMatch[2] || '';
+      // Remove quote from content
+      content = content.replace(/^>.*$/m, '').trim();
+    }
+    
     setFormData({
       title: essay.title,
       date: essay.date,
       readTime: essay.readTime,
       preview: essay.preview,
-      content: essay.content,
+      quote: quote,
+      quoteAuthor: quoteAuthor,
+      content: content,
       tags: essay.tags.join(', ')
     });
     setIsEditing(true);
@@ -86,8 +109,21 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
       return;
     }
 
+    // Prepare content with quote if provided
+    let finalContent = formData.content;
+    if (formData.quote) {
+      const quoteText = formData.quoteAuthor 
+        ? `> "${formData.quote}" - ${formData.quoteAuthor}`
+        : `> "${formData.quote}"`;
+      finalContent = `${quoteText}\n\n${formData.content}`;
+    }
+
     const essayData = {
-      ...formData,
+      title: formData.title,
+      date: formData.date,
+      readTime: formData.readTime,
+      preview: formData.preview,
+      content: finalContent,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
     };
 
@@ -246,6 +282,31 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
                 rows={2}
                 className="mac-system-font text-xs"
               />
+            </div>
+            
+            <div className="space-y-2 p-3 bg-cream-50 mac-border-inset">
+              <Label className="text-xs font-bold">Quote (Optional)</Label>
+              <div>
+                <Label htmlFor="quote" className="text-xs">Quote Text</Label>
+                <Textarea
+                  id="quote"
+                  value={formData.quote}
+                  onChange={(e) => setFormData({...formData, quote: e.target.value})}
+                  rows={2}
+                  className="font-pixel italic text-xs"
+                  placeholder="Enter an inspiring quote..."
+                />
+              </div>
+              <div>
+                <Label htmlFor="quoteAuthor" className="text-xs">Author (Optional)</Label>
+                <Input
+                  id="quoteAuthor"
+                  value={formData.quoteAuthor}
+                  onChange={(e) => setFormData({...formData, quoteAuthor: e.target.value})}
+                  className="font-pixel italic text-xs"
+                  placeholder="e.g., Steve Jobs"
+                />
+              </div>
             </div>
             
             <div>

@@ -185,6 +185,11 @@ const Index = () => {
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
+      // If window is already open, just focus it
+      if (prev[windowName].isOpen) {
+        return prev;
+      }
+      
       const newMaxZIndex = maxZIndex + 1;
       setMaxZIndex(newMaxZIndex);
       
@@ -193,6 +198,11 @@ const Index = () => {
         [windowName]: { isOpen: true, zIndex: newMaxZIndex },
       };
     });
+    
+    // If window was already open, focus it
+    if (windowStates[windowName].isOpen) {
+      focusWindow(windowName);
+    }
   };
 
   const closeWindow = (windowName: WindowName) => {

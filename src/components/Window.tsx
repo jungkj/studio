@@ -100,7 +100,8 @@ const Window: React.FC<WindowProps> = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!draggable) return;
     e.preventDefault();
-    onFocus?.();
+    e.stopPropagation(); // Prevent event from bubbling to parent
+    onFocus?.(); // Always call focus when clicking title bar
     setIsDragging(true);
     setDragStart({
       x: e.clientX - position.x,
