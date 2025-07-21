@@ -237,7 +237,6 @@ const Index = () => {
 
   const iconBaseUrl = "/icons";
   const desktopIcons = [
-    { name: 'myComputer', label: 'My Computer', icon: 'Be-Os-Be-Box-Be-Cabinet.32.png', fallback: 'computer' as const },
     { name: 'work', label: 'My Work', icon: 'Be-Os-Be-Box-Be-Folder.32.png', fallback: 'folder' as const },
     { name: 'essays', label: 'My Essays', icon: 'Be-Os-Be-Box-Be-Card-Stack.32.png', fallback: 'document' as const },
     { name: 'gamesLauncher', label: 'Games', icon: 'Be-Os-Be-Box-Be-Play.32.png', fallback: 'game' as const },
@@ -255,7 +254,7 @@ const Index = () => {
       <MenuBar 
         onOpenAbout={() => openWindow('about')}
         onOpenCalculator={() => openWindow('calculator')}
-        onOpenFinder={() => openWindow('myComputer')}
+        onOpenFinder={() => {}}
         onOpenClock={() => openWindow('clock')}
         onOpenSettings={() => setShowSettings(true)}
         onRestart={() => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelButton } from './PixelButton';
-import { Code, Image, ExternalLink, Briefcase, ArrowUpRight } from 'lucide-react';
+import { Code, Image, ExternalLink, Briefcase, ArrowUpRight, Link } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WorkAppProps {
@@ -78,25 +78,20 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
                     </span>
                   </div>
                 </div>
-                {project.link !== '#' && (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-mac-light-gray mac-border-outset p-2 hover:mac-border-inset transition-all"
-                    title="View project"
-                  >
-                    <div className="pixelated-arrow">
-                      <div className="arrow-pixel arrow-pixel-1"></div>
-                      <div className="arrow-pixel arrow-pixel-2"></div>
-                      <div className="arrow-pixel arrow-pixel-3"></div>
-                      <div className="arrow-pixel arrow-pixel-4"></div>
-                      <div className="arrow-pixel arrow-pixel-5"></div>
-                      <div className="arrow-pixel arrow-pixel-6"></div>
-                      <div className="arrow-pixel arrow-pixel-7"></div>
-                    </div>
-                  </a>
-                )}
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "bg-mac-light-gray mac-border-outset p-2 transition-all flex items-center justify-center",
+                    project.link !== '#' 
+                      ? "hover:mac-border-inset cursor-pointer" 
+                      : "opacity-50 cursor-not-allowed pointer-events-none"
+                  )}
+                  title={project.link !== '#' ? "View project" : "Link coming soon"}
+                >
+                  <ExternalLink size={16} className="text-mac-black" />
+                </a>
               </div>
               
               {/* Description */}
@@ -107,7 +102,7 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
               </div>
               
               {/* Technologies */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 items-center">
                 {project.technologies.map((tech, techIndex) => (
                   <span 
                     key={techIndex} 
@@ -116,6 +111,11 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
                     {tech}
                   </span>
                 ))}
+                {project.link === '#' && (
+                  <span className="text-xs text-mac-dark-gray italic ml-auto">
+                    (link coming soon)
+                  </span>
+                )}
               </div>
             </div>
           ))}

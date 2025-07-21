@@ -1,109 +1,95 @@
 import React from 'react';
 import { PixelButton } from './PixelButton';
-import { Mail, Github, Linkedin, Twitter, MessageCircle } from 'lucide-react';
+import { Mail, Github, Linkedin, ExternalLink } from 'lucide-react';
 
 interface ContactAppProps {
   onClose: () => void;
 }
 
 const ContactApp: React.FC<ContactAppProps> = ({ onClose }) => {
-  const contactMethods = [
+  const contacts = [
     {
-      icon: Mail,
-      label: 'Email',
-      value: 'andyjung@example.com',
-      link: 'mailto:andyjung@example.com',
-      description: 'Best for: Real conversations, collaboration, or just saying hi'
+      icon: '📧',
+      label: 'Gmail',
+      value: 'andyjung2001@gmail.com',
+      link: 'mailto:andyjung2001@gmail.com',
+      color: 'bg-red-500'
     },
     {
-      icon: Linkedin,
-      label: 'LinkedIn', 
-      value: 'Andy Jung',
-      link: 'https://linkedin.com/in/andyjung',
-      description: 'Best for: Professional stuff (but I promise I\'m not boring)'
+      icon: '💼',
+      label: 'LinkedIn',
+      value: 'Ki Hwan Andy Jung',
+      link: 'https://www.linkedin.com/in/ki-hwan-andy-jung/',
+      color: 'bg-blue-600'
     },
     {
-      icon: Github,
+      icon: '🐙',
       label: 'GitHub',
-      value: '@andyjung',
-      link: 'https://github.com/andyjung',
-      description: 'Best for: Seeing my code, judging my commit messages'
-    },
-    {
-      icon: Twitter,
-      label: 'Twitter/X',
-      value: '@andyjung',
-      link: 'https://twitter.com/andyjung',
-      description: 'Best for: Hot takes, memes, and probably too many startup thoughts'
+      value: '@jungkj',
+      link: 'https://github.com/jungkj',
+      color: 'bg-gray-800'
     }
   ];
 
   return (
-    <div className="p-3 mac-system-font text-mac-black flex flex-col h-full bg-mac-light-gray">
-      <div className="text-center mb-4">
-        <h2 className="text-lg font-bold mb-1">Let's Connect</h2>
-        <div className="text-sm text-mac-dark-gray">Always down to chat about cool projects 💬</div>
+    <div className="h-full flex flex-col bg-mac-white">
+      {/* Header */}
+      <div className="bg-mac-light-gray mac-border-inset p-4 text-center">
+        <h2 className="text-lg font-bold text-mac-black">Contact Me</h2>
+        <p className="text-xs text-mac-dark-gray mt-1">Click to connect</p>
       </div>
       
-      <div className="flex-grow overflow-auto mac-border-inset bg-mac-white p-4 mb-4">
-        <div className="space-y-4 mb-6">
-          {contactMethods.map((method, index) => (
-            <div key={index} className="mac-border-outset bg-mac-light-gray p-4">
-              <div className="flex items-center mb-2">
-                <method.icon size={18} className="mr-3 text-mac-dark-gray" />
-                <div className="flex-grow min-w-0">
-                  <div className="font-bold text-base break-words">{method.label}</div>
-                  <a 
-                    href={method.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-mac-dark-gray hover:text-mac-black hover:underline break-words"
-                  >
-                    {method.value}
-                  </a>
+      {/* Contact Grid */}
+      <div className="flex-1 p-6">
+        <div className="grid gap-4">
+          {contacts.map((contact, index) => (
+            <a
+              key={index}
+              href={contact.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block group"
+            >
+              <div className="bg-mac-light-gray mac-border-outset p-4 hover:mac-border-inset transition-all cursor-pointer">
+                <div className="flex items-center gap-4">
+                  {/* Retro Icon */}
+                  <div className="text-3xl select-none">
+                    {contact.icon}
+                  </div>
+                  
+                  {/* Contact Info */}
+                  <div className="flex-1">
+                    <div className="font-bold text-sm text-mac-black group-hover:text-apple-blue transition-colors">
+                      {contact.label}
+                    </div>
+                    <div className="text-xs text-mac-dark-gray">
+                      {contact.value}
+                    </div>
+                  </div>
+                  
+                  {/* External Link Icon */}
+                  <ExternalLink 
+                    size={16} 
+                    className="text-mac-dark-gray opacity-0 group-hover:opacity-100 transition-opacity" 
+                  />
                 </div>
               </div>
-              <p className="text-xs text-mac-dark-gray ml-9 break-words">
-                {method.description}
-              </p>
-            </div>
+            </a>
           ))}
         </div>
-
-        <div className="mac-border-inset bg-mac-light-gray p-4 mb-4">
-          <div className="text-center">
-            <MessageCircle size={24} className="mx-auto mb-2 text-mac-dark-gray" />
-            <div className="text-base font-bold mb-2">What I'm looking for:</div>
-            <div className="text-sm space-y-1">
-              <div>• Cool people building cool things</div>
-              <div>• Startup opportunities (early-stage preferred)</div>
-              <div>• Freelance projects that don't suck</div>
-              <div>• Coffee chats about literally anything</div>
-              <div>• Collaborations on side projects</div>
-            </div>
-          </div>
-        </div>
-
-                  <div className="text-center p-3 mac-border-inset bg-mac-light-gray">
-          <div className="text-sm font-bold mb-2">Response Time ⏰</div>
-          <div className="text-xs text-mac-dark-gray space-y-1">
-            <div className="break-words">Email: Usually within 24 hours</div>
-            <div className="break-words">Social Media: When I remember to check</div>
-            <div className="break-words">Actual good opportunities: Immediately</div>
-          </div>
-        </div>
-
-        <div className="mt-4 text-center">
-          <div className="text-xs text-mac-dark-gray italic">
-            "The best opportunities come from the most unexpected conversations." 
-            <br />- Someone smart, probably
-          </div>
+        
+        {/* Quick Message */}
+        <div className="mt-6 p-4 bg-cream-50 mac-border-inset text-center">
+          <p className="text-xs text-mac-black">
+            Always open to interesting projects and collaborations!
+          </p>
         </div>
       </div>
       
-      <div className="text-center">
-        <PixelButton onClick={onClose} variant="default" className="px-6">
-          Back to Desktop
+      {/* Footer */}
+      <div className="p-4 bg-mac-light-gray mac-border-outset">
+        <PixelButton onClick={onClose} variant="default" className="w-full">
+          ← Back to Desktop
         </PixelButton>
       </div>
     </div>
