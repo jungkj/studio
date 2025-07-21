@@ -2,9 +2,10 @@ export const designTokens = {
   // Typography
   typography: {
     fontFamily: {
-      primary: '"Press Start 2P", cursive',
+      primary: 'Monaco, Menlo, "Courier New", monospace',
       system: 'Monaco, Menlo, "Courier New", monospace',
       mono: 'Monaco, Menlo, "Courier New", monospace',
+      pixel: '"Press Start 2P", cursive', // Keep for special cases only
     },
     fontSize: {
       '2xs': '0.625rem',    // 10px

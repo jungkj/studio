@@ -48,8 +48,8 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
       {/* Header */}
       <div className="bg-mac-white mac-border-inset p-4 m-4 mb-2">
         <div className="text-center">
-          <h1 className="text-lg font-bold text-mac-black pixel-font mb-1">My Work</h1>
-          <p className="text-xs text-mac-dark-gray pixel-font">
+          <h1 className="text-lg font-bold text-mac-black mb-1">My Work</h1>
+          <p className="text-xs text-mac-dark-gray">
             things ive built
           </p>
         </div>
@@ -70,10 +70,10 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
                     <project.icon size={18} className="text-mac-black" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-base font-bold mb-1 text-mac-black pixel-font">
+                    <h2 className="text-base font-bold mb-1 text-mac-black">
                       {project.title}
                     </h2>
-                    <span className="text-xs text-mac-dark-gray pixel-font inline-block bg-cream-50 px-2 py-1 mac-border-outset">
+                    <span className="text-xs text-mac-dark-gray inline-block bg-cream-50 px-2 py-1 mac-border-outset">
                       {project.status}
                     </span>
                   </div>
@@ -101,7 +101,7 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
               
               {/* Description */}
               <div className="bg-cream-25 mac-border-inset p-3 mb-3">
-                <p className="text-sm leading-relaxed text-mac-black pixel-font">
+                <p className="text-sm leading-relaxed text-mac-black">
                   {project.description}
                 </p>
               </div>
@@ -111,7 +111,7 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
                 {project.technologies.map((tech, techIndex) => (
                   <span 
                     key={techIndex} 
-                    className="bg-mac-white text-mac-black text-xs px-3 py-1 mac-border-outset pixel-font hover:bg-mac-light-gray transition-colors"
+                    className="bg-mac-white text-mac-black text-xs px-3 py-1 mac-border-outset hover:bg-mac-light-gray transition-colors"
                   >
                     {tech}
                   </span>

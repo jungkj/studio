@@ -68,30 +68,32 @@ const MacLoadingScreen: React.FC<MacLoadingScreenProps> = ({ onLoadingComplete }
 
   return (
     <div 
-      className={`fixed inset-0 w-screen h-screen bg-black flex items-center justify-center z-50 overflow-hidden transition-opacity duration-300 ${
+      className={`fixed inset-0 w-screen h-screen mac-desktop-bg flex items-center justify-center z-50 overflow-hidden transition-opacity duration-300 ${
         fadeOut ? 'opacity-0' : 'opacity-100'
       }`}
     >
       <div className="text-center">
         {/* Minimal retro terminal loading */}
-        <div className="font-mono text-green-400 text-sm">
-          {!isComplete ? (
-            <div className="flex items-center justify-center space-x-2">
-              <span className="text-lg">{spinnerChars[spinnerFrame]}</span>
-              <span>Loading</span>
-              <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity`}>_</span>
-            </div>
-          ) : (
-            <div className="animate-fade-in">
-              <span>Ready</span>
-              <span className={`ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity`}>_</span>
-            </div>
-          )}
+        <div className="bg-black/80 px-6 py-4 rounded-sm mac-border-inset">
+          <div className="font-mono text-green-400 text-sm">
+            {!isComplete ? (
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-lg">{spinnerChars[spinnerFrame]}</span>
+                <span>Loading</span>
+                <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity`}>_</span>
+              </div>
+            ) : (
+              <div className="animate-fade-in">
+                <span>Ready</span>
+                <span className={`ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity`}>_</span>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Skip hint - subtle and minimal */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="font-mono text-green-400 text-xs opacity-50">
+          <div className="font-mono text-black bg-mac-light-gray/90 px-3 py-1 rounded-sm text-xs mac-border-outset">
             Press space to skip
           </div>
         </div>

@@ -307,7 +307,7 @@ const MenuBar: React.FC<MenuBarProps> = ({
 
         {/* Right side: System status indicators */}
         <div className="flex items-center h-full gap-2">
-          <div className="text-xs font-bold text-mac-black pixel-font">
+          <div className="text-xs font-bold text-mac-black">
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>

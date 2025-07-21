@@ -20,10 +20,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Set 'Press Start 2P' as the default sans-serif font
-        sans: ['"Press Start 2P"', 'cursive'],
-        // Keep pixel for explicit use if needed, though 'sans' will now be pixelated
+        // Set Monaco/system font as the default sans-serif font
+        sans: ['Monaco', 'Menlo', '"Courier New"', 'monospace'],
+        // Keep pixel font available for special use cases
         pixel: ['"Press Start 2P"', 'cursive'],
+        // System font alias
+        system: ['Monaco', 'Menlo', '"Courier New"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -130,7 +130,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-mac-white mac-border-outset p-6 max-w-sm w-full mx-4">
-          <h3 className="text-lg font-bold mb-4 text-mac-black pixel-font">Admin Sign In</h3>
+          <h3 className="text-lg font-bold mb-4 text-mac-black">Admin Sign In</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <input
@@ -180,7 +180,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         <div className="text-center">
           <div className="animate-pulse">
             <BookOpen className="w-8 h-8 text-mac-dark-gray mx-auto mb-2" />
-            <p className="text-sm text-mac-dark-gray pixel-font">Loading essays...</p>
+            <p className="text-sm text-mac-dark-gray">Loading essays...</p>
           </div>
         </div>
       </div>
@@ -193,8 +193,8 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
       <div className="flex flex-col h-full bg-mac-light-gray mac-system-font">
         <div className="flex-1 flex items-center justify-center">
           <div className="bg-mac-white mac-border-outset p-8 text-center max-w-md">
-            <h2 className="text-xl font-bold text-mac-black mb-4 pixel-font">Connection Error</h2>
-            <p className="text-mac-black mb-6 pixel-font">{error}</p>
+            <h2 className="text-xl font-bold text-mac-black mb-4">Connection Error</h2>
+            <p className="text-mac-black mb-6">{error}</p>
             <PixelButton
               onClick={() => window.location.reload()}
               className="bg-mac-medium-gray hover:bg-mac-dark-gray text-mac-black hover:text-mac-white"
@@ -216,7 +216,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <BookOpen size={20} className="text-mac-black" />
-            <h1 className="text-lg font-bold text-mac-black pixel-font">My Essays</h1>
+            <h1 className="text-lg font-bold text-mac-black">My Essays</h1>
           </div>
           
           {/* Auth controls */}
@@ -248,7 +248,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
           )}
         </div>
         
-        <p className="text-xs text-mac-dark-gray mt-2 pixel-font">
+        <p className="text-xs text-mac-dark-gray mt-2">
           Thoughts on technology, life, and everything in between
         </p>
         
@@ -265,7 +265,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         {essays.length === 0 ? (
           <div className="text-center py-16">
             <BookOpen className="w-12 h-12 text-mac-medium-gray mx-auto mb-4" />
-            <p className="text-mac-dark-gray pixel-font">No essays yet</p>
+            <p className="text-mac-dark-gray">No essays yet</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -282,12 +282,12 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
                 >
                   <div className="p-4">
                     {/* Essay header */}
-                    <h2 className="text-sm font-bold text-mac-black mb-2 pixel-font">
+                    <h2 className="text-sm font-bold text-mac-black mb-2">
                       {essay.title}
                     </h2>
                     
                     {/* Meta info */}
-                    <div className="flex items-center gap-3 text-xs text-mac-dark-gray mb-2 pixel-font">
+                    <div className="flex items-center gap-3 text-xs text-mac-dark-gray mb-2">
                       <span className="flex items-center gap-1">
                         <Calendar size={10} />
                         {formatDate(essay.published_at || essay.created_at)}
@@ -300,7 +300,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
                     
                     {/* Excerpt */}
                     {essay.excerpt && !expandedEssay && (
-                      <p className="text-xs text-mac-dark-gray line-clamp-2 pixel-font">
+                      <p className="text-xs text-mac-dark-gray line-clamp-2">
                         {essay.excerpt}
                       </p>
                     )}
@@ -312,20 +312,20 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
                       {quote && (
                         <div className="my-3">
                           <div className="bg-cream-50 mac-border-inset p-3">
-                            <p className="text-xs text-mac-dark-gray italic text-center pixel-font">
+                            <p className="text-xs text-mac-dark-gray italic text-center">
                               {quote}
                             </p>
                           </div>
                         </div>
                       )}
                       <div className="bg-mac-light-gray mac-border-inset p-3">
-                        <p className="text-xs leading-relaxed text-mac-black whitespace-pre-line pixel-font">
+                        <p className="text-xs leading-relaxed text-mac-black whitespace-pre-line">
                           {content.substring(0, 1000)}
                           {content.length > 1000 && '...'}
                         </p>
                       </div>
                       <div className="mt-3 text-center">
-                        <span className="text-xs text-mac-dark-gray pixel-font">
+                        <span className="text-xs text-mac-dark-gray">
                           💭 Click again to collapse
                         </span>
                       </div>

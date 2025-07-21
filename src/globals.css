@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global font styles for consistency */
+@layer base {
+  html, body {
+    font-family: Monaco, Menlo, "Courier New", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  /* Override any pixel font usage by default */
+  * {
+    font-family: inherit;
+  }
+}
+
 /* Custom utilities for the revamped components */
 .line-clamp-2 {
   display: -webkit-box;
@@ -547,9 +563,9 @@ input[type="range"]::-moz-range-thumb {
 .mac-system-font {
   font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
   font-size: 14px;
-  line-height: 1.3;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: unset;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Remove old custom styles */

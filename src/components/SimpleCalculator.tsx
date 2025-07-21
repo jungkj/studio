@@ -84,7 +84,7 @@ const SimpleCalculator: React.FC<SimpleCalculatorProps> = ({ onClose }) => {
     <div className="p-4 bg-mac-light-gray mac-system-font h-full">
       {/* Display */}
       <div className="bg-mac-white mac-border-inset p-3 mb-4 text-right">
-        <div className="text-2xl font-bold text-mac-black pixel-font min-h-[40px] flex items-center justify-end">
+        <div className="text-2xl font-bold text-mac-black min-h-[40px] flex items-center justify-end">
           {display}
         </div>
       </div>
