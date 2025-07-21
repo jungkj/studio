@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { designTokens } from '@/utils/designTokens';
 
 interface WindowProps {
   title: string;
@@ -20,9 +21,12 @@ const Window: React.FC<WindowProps> = ({
   children, 
   onClose, 
   initialPosition = { x: 100, y: 100 }, 
-  initialSize = { width: 400, height: 300 },
+  initialSize = { 
+    width: designTokens.window.defaultWidth, 
+    height: designTokens.window.defaultHeight 
+  },
   className, 
-  zIndex = 1, 
+  zIndex = designTokens.zIndex.window, 
   onFocus,
   resizable = true,
   draggable = true
@@ -34,10 +38,34 @@ const Window: React.FC<WindowProps> = ({
   const [isResizing, setIsResizing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const [titleFontSize, setTitleFontSize] = useState('text-xs');
 
   const windowRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
+
+  // Notify content of size changes using ResizeObserver
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Dispatch a custom event that child components can listen to
+        const event = new CustomEvent('windowResize', {
+          detail: {
+            width: entry.contentRect.width,
+            height: entry.contentRect.height
+          }
+        });
+        entry.target.dispatchEvent(event);
+      }
+    });
+
+    resizeObserver.observe(contentRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // Dynamic title sizing based on available space
   useEffect(() => {
@@ -60,14 +88,7 @@ const Window: React.FC<WindowProps> = ({
             // Use CSS transform for smooth scaling
             titleElement.style.transform = `scale(${scaleFactor})`;
             titleElement.style.transformOrigin = 'left center';
-          } else {
-            // Use smaller font size classes for minor adjustments
-            if (scaleFactor < 0.95) {
-              setTitleFontSize('text-xs');
-            }
           }
-        } else {
-          setTitleFontSize('text-xs');
         }
       }
     };
@@ -92,6 +113,7 @@ const Window: React.FC<WindowProps> = ({
     if (!resizable) return;
     e.preventDefault();
     e.stopPropagation();
+    onFocus?.();
     setIsResizing(true);
     setResizeStart({
       x: e.clientX,
@@ -106,15 +128,15 @@ const Window: React.FC<WindowProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
         const newX = Math.max(0, Math.min(window.innerWidth - size.width, e.clientX - dragStart.x));
-        const newY = Math.max(0, Math.min(window.innerHeight - 30, e.clientY - dragStart.y));
+        const newY = Math.max(0, Math.min(window.innerHeight - designTokens.window.titleBarHeight, e.clientY - dragStart.y));
         setPosition({ x: newX, y: newY });
       }
 
       if (isResizing) {
         const deltaX = e.clientX - resizeStart.x;
         const deltaY = e.clientY - resizeStart.y;
-        const newWidth = Math.max(200, resizeStart.width + deltaX);
-        const newHeight = Math.max(150, resizeStart.height + deltaY);
+        const newWidth = Math.max(designTokens.window.minWidth, resizeStart.width + deltaX);
+        const newHeight = Math.max(designTokens.window.minHeight, resizeStart.height + deltaY);
         setSize({ width: newWidth, height: newHeight });
       }
     };
@@ -140,17 +162,16 @@ const Window: React.FC<WindowProps> = ({
       <div
         ref={windowRef}
         className={cn(
-          "absolute bg-mac-darker-gray mac-border-outset pointer-events-auto",
+          "absolute bg-mac-darker-gray mac-border-outset pointer-events-auto flex flex-col",
           // Only apply transitions when NOT dragging or resizing
           !isDragging && !isResizing && "transition-all duration-200 ease-in-out",
-          isMinimized ? "h-8" : "",
           className
         )}
         style={{
           left: position.x,
           top: position.y,
           width: size.width,
-          height: isMinimized ? 32 : size.height,
+          height: isMinimized ? designTokens.window.titleBarHeight : size.height,
           zIndex,
         }}
         onMouseDown={onFocus}
@@ -158,7 +179,7 @@ const Window: React.FC<WindowProps> = ({
         {/* Title Bar */}
         <div
           className={cn(
-            "h-8 bg-mac-darker-gray mac-border-inset flex items-center justify-between px-2 text-mac-black font-bold",
+            "h-8 bg-mac-darker-gray mac-border-inset flex items-center justify-between px-2 text-mac-black font-bold flex-shrink-0",
             draggable && "cursor-move",
             // Remove transitions during dragging for title bar too
             !isDragging && "transition-colors duration-150"
@@ -172,11 +193,9 @@ const Window: React.FC<WindowProps> = ({
           <div className="flex items-center flex-1 min-w-0 mr-2">
             <span 
               ref={titleRef}
-              className={cn(
-                "select-none font-bold whitespace-nowrap",
-                titleFontSize
-              )}
+              className="select-none font-bold whitespace-nowrap text-xs"
               style={{ 
+                fontFamily: designTokens.typography.fontFamily.system,
                 maxWidth: '100%',
                 display: 'block',
                 overflow: 'hidden'
@@ -210,21 +229,33 @@ const Window: React.FC<WindowProps> = ({
           </div>
         </div>
 
-        {/* Window Content */}
+        {/* Window Content - Now properly sized */}
         {!isMinimized && (
-          <div className="flex flex-col h-full bg-mac-white">
-            <div className="flex-1 overflow-hidden p-2">
+          <div 
+            ref={contentRef}
+            className="flex-1 bg-mac-white overflow-hidden relative"
+            style={{
+              // Ensure content fills remaining space
+              height: `calc(100% - ${designTokens.window.titleBarHeight}px)`
+            }}
+          >
+            <div className="absolute inset-0 overflow-auto p-2">
               {children}
             </div>
           </div>
         )}
 
-        {/* Resize Handle */}
+        {/* Resize Handle - Fixed positioning */}
         {!isMinimized && resizable && (
           <div
-            className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize z-10"
+            className="absolute cursor-se-resize"
             onMouseDown={handleResizeMouseDown}
             style={{
+              bottom: 0,
+              right: 0,
+              width: designTokens.window.resizeHandleSize,
+              height: designTokens.window.resizeHandleSize,
+              zIndex: 10,
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 15H16V16H15V15Z' fill='%23000000'/%3E%3Cpath d='M13 15H14V16H13V15Z' fill='%23000000'/%3E%3Cpath d='M11 15H12V16H11V15Z' fill='%23000000'/%3E%3Cpath d='M15 13H16V14H15V13Z' fill='%23000000'/%3E%3Cpath d='M13 13H14V14H13V13Z' fill='%23000000'/%3E%3Cpath d='M15 11H16V12H15V11Z' fill='%23000000'/%3E%3Cpath d='M9 15H10V16H9V15Z' fill='%23666666'/%3E%3Cpath d='M11 13H12V14H11V13Z' fill='%23666666'/%3E%3Cpath d='M13 11H14V12H13V11Z' fill='%23666666'/%3E%3Cpath d='M15 9H16V10H15V9Z' fill='%23666666'/%3E%3C/svg%3E")`,
               backgroundPosition: 'bottom right',
               backgroundRepeat: 'no-repeat'
