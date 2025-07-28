@@ -85,9 +85,10 @@ export const logSupabaseConfig = (): void => {
 export const checkSupabaseConnection = async (): Promise<boolean> => {
   try {
     const client = getSupabaseClient();
-    const { data, error } = await client.from('projects').select('count').limit(1);
+    // Check essays table since that's what we're trying to load
+    const { data, error } = await client.from('essays').select('count').limit(1);
     
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "table not found" which is ok for initial setup
+    if (error) {
       console.error('🗄️ Supabase connection error:', error);
       return false;
     }

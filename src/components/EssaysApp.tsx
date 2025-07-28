@@ -21,6 +21,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
   const [expandedEssay, setExpandedEssay] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState('Loading essays...');
 
   // Auth hook
   const { 
@@ -32,28 +33,56 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
     loading: authLoading 
   } = useAuth();
 
-  // Load essays
+  // Load essays with retry logic
   useEffect(() => {
+    let mounted = true;
+    let retryTimeout: NodeJS.Timeout;
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 seconds
+
     const loadEssays = async () => {
+      if (!mounted) return;
+
       console.log('🔍 Starting to load essays...');
       setIsLoading(true);
       setError(null);
+      setLoadingMessage(retryCount > 0 ? `Retrying... (${retryCount}/${maxRetries})` : 'Loading essays...');
       
       try {
-        // First check if we can connect to Supabase
-        const isConnected = await checkSupabaseConnection();
-        console.log('🔌 Supabase connection status:', isConnected);
-        
-        if (!isConnected) {
-          setError('Unable to connect to database. Please check your connection.');
-          return;
+        // Add timeout wrapper
+        const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+          return Promise.race([
+            promise,
+            new Promise<T>((_, reject) => 
+              setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
+            )
+          ]);
+        };
+
+        // First check if we can connect to Supabase with timeout
+        let isConnected = false;
+        try {
+          isConnected = await withTimeout(checkSupabaseConnection(), 5000);
+          console.log('🔌 Supabase connection status:', isConnected);
+        } catch (connectionError) {
+          console.error('🔌 Connection check failed:', connectionError);
+          throw new Error('Connection timeout - please check your internet connection');
         }
         
-        const { data, error, count } = await essayService.getPublishedEssays({
-          limit: 50,
-          orderBy: 'published_at',
-          ascending: false
-        });
+        if (!isConnected) {
+          throw new Error('Unable to connect to database - please check Supabase configuration');
+        }
+        
+        // Load essays with timeout
+        const { data, error, count } = await withTimeout(
+          essayService.getPublishedEssays({
+            limit: 50,
+            orderBy: 'published_at',
+            ascending: false
+          }),
+          10000 // 10 second timeout
+        );
 
         console.log('📚 Essays response:', { 
           dataLength: data?.length || 0, 
@@ -64,25 +93,42 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
 
         if (error) {
           console.error('❌ Error from Supabase:', error);
-          setError(`Database error: ${error}`);
-        } else if (!data || data.length === 0) {
-          console.log('📭 No essays found in database');
-          setEssays([]);
-          // Don't show error, just empty state
+          throw new Error(`Database error: ${error}`);
         } else {
-          console.log(`✅ Successfully loaded ${data.length} essays`);
-          setEssays(data);
+          console.log(`✅ Successfully loaded ${data?.length || 0} essays`);
+          if (mounted) {
+            setEssays(data || []);
+            setIsLoading(false);
+          }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(`Failed to load essays: ${errorMessage}`);
         console.error('❌ Exception loading essays:', err);
-      } finally {
-        setIsLoading(false);
+        
+        // Retry logic
+        if (retryCount < maxRetries && mounted) {
+          retryCount++;
+          console.log(`🔄 Retrying... (${retryCount}/${maxRetries})`);
+          retryTimeout = setTimeout(() => {
+            if (mounted) loadEssays();
+          }, retryDelay);
+        } else {
+          // Final error after all retries
+          if (mounted) {
+            setError(`Failed to load essays: ${errorMessage}. Please check your connection and try again.`);
+            setIsLoading(false);
+          }
+        }
       }
     };
 
     loadEssays();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+      if (retryTimeout) clearTimeout(retryTimeout);
+    };
   }, []);
 
   // Refresh essays
@@ -238,7 +284,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         <div className="text-center">
           <div className="animate-pulse">
             <BookOpen className="w-8 h-8 text-mac-dark-gray mx-auto mb-2" />
-            <p className="text-sm text-mac-dark-gray">Loading essays...</p>
+            <p className="text-sm text-mac-dark-gray">{loadingMessage}</p>
           </div>
         </div>
       </div>

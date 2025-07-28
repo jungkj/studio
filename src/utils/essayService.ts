@@ -76,14 +76,21 @@ export class EssayService {
       const { data, error, count } = await query;
 
       if (error) {
-        console.error('Error fetching published essays:', error);
+        console.error('Error fetching published essays:', {
+          error,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         return { data: [], count: 0, error: error.message };
       }
 
       return { data: data || [], count, error: null };
     } catch (error) {
       console.error('Exception in getPublishedEssays:', error);
-      return { data: [], count: 0, error: 'Failed to fetch published essays' };
+      const errorMsg = error instanceof Error ? error.message : 'Failed to fetch published essays';
+      return { data: [], count: 0, error: errorMsg };
     }
   }
 
