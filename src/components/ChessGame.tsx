@@ -10,10 +10,10 @@ interface ChessGameProps {
   onClose?: () => void;
 }
 
-// Chess piece unicode symbols with better visibility
+// Chess piece unicode symbols - using filled versions for white pieces
 const PIECE_SYMBOLS = {
-  'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-  'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+  'K': '♚', 'Q': '♛', 'R': '♜', 'B': '♝', 'N': '♞', 'P': '♟',  // White pieces (filled)
+  'k': '♔', 'q': '♕', 'r': '♖', 'b': '♗', 'n': '♘', 'p': '♙'   // Black pieces (outline)
 };
 
 interface DragState {
@@ -437,13 +437,15 @@ export const ChessGame: React.FC<ChessGameProps> = ({ onClose }) => {
                 {/* Piece */}
                 {piece && !isDragOrigin && (
                   <span 
-                    className={`text-6xl leading-none ${piece.color === 'w' ? 'text-white' : 'text-black'} drop-shadow-md`}
+                    className={`text-6xl leading-none`}
                     style={{ 
                       cursor: piece.color === playerColor && game.turn() === playerColor ? 'grab' : 'default',
                       userSelect: 'none',
-                      filter: piece.color === 'w' 
-                        ? 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))' 
-                        : 'drop-shadow(1px 1px 1px rgba(0,0,0,0.3))'
+                      color: piece.color === 'w' ? '#FFFFFF' : '#000000',
+                      textShadow: piece.color === 'w' 
+                        ? '0 0 3px #000, 1px 1px 2px rgba(0,0,0,0.8)' 
+                        : '0 0 2px #fff, 1px 1px 1px rgba(255,255,255,0.3)',
+                      WebkitTextStroke: piece.color === 'w' ? '1px black' : '0.5px white'
                     }}
                   >
                     {PIECE_SYMBOLS[`${piece.color === 'w' ? piece.type.toUpperCase() : piece.type}`]}
@@ -476,11 +478,13 @@ export const ChessGame: React.FC<ChessGameProps> = ({ onClose }) => {
             }}
           >
             <span 
-              className={`text-6xl leading-none ${dragState.piece.color === 'w' ? 'text-white' : 'text-black'}`}
+              className={`text-6xl leading-none`}
               style={{ 
-                filter: dragState.piece.color === 'w' 
-                  ? 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))' 
-                  : 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))'
+                color: dragState.piece.color === 'w' ? '#FFFFFF' : '#000000',
+                textShadow: dragState.piece.color === 'w' 
+                  ? '0 0 3px #000, 2px 2px 4px rgba(0,0,0,0.8)' 
+                  : '0 0 2px #fff, 2px 2px 3px rgba(255,255,255,0.3)',
+                WebkitTextStroke: dragState.piece.color === 'w' ? '1px black' : '0.5px white'
               }}
             >
               {PIECE_SYMBOLS[`${dragState.piece.color === 'w' ? dragState.piece.type.toUpperCase() : dragState.piece.type}`]}
