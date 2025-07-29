@@ -2,6 +2,7 @@ import React from 'react';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ToasterContextProvider } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { GlobalFollowingPointer } from "@/components/ui/following-pointer";
 import { Providers } from "./providers";
 import "@/globals.css";
 import type { Metadata } from 'next';
@@ -27,6 +28,7 @@ export default function RootLayout({
         <Providers>
           <ToasterContextProvider>
             <TooltipProvider>
+              <GlobalFollowingPointer cursorImage="/pointer_reg.png" />
               {children}
             </TooltipProvider>
             <Toaster />

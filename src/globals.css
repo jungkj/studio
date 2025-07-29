@@ -10,11 +10,18 @@
     -moz-osx-font-smoothing: grayscale;
     font-size: 14px;
     line-height: 1.4;
+    cursor: none !important;
   }
   
-  /* Override any pixel font usage by default */
+  /* Hide cursor globally */
   * {
     font-family: inherit;
+    cursor: none !important;
+  }
+  
+  /* Ensure cursor is hidden on all interactive elements */
+  a, button, input, textarea, select, [role="button"], [onclick], .cursor-pointer {
+    cursor: none !important;
   }
 }
 
