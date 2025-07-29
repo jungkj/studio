@@ -10,10 +10,10 @@ interface ChessGameProps {
   onClose?: () => void;
 }
 
-// Chess piece unicode symbols - using filled versions for white pieces
+// Chess piece unicode symbols - all filled for better visibility
 const PIECE_SYMBOLS = {
-  'K': '♚', 'Q': '♛', 'R': '♜', 'B': '♝', 'N': '♞', 'P': '♟',  // White pieces (filled)
-  'k': '♔', 'q': '♕', 'r': '♖', 'b': '♗', 'n': '♘', 'p': '♙'   // Black pieces (outline)
+  'K': '♚', 'Q': '♛', 'R': '♜', 'B': '♝', 'N': '♞', 'P': '♟',  // White pieces
+  'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'   // Black pieces (same symbols)
 };
 
 interface DragState {
