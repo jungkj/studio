@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Essay, essayStorage } from '@/utils/essayStorage';
+import { essayService } from '@/utils/essayService';
 import { PixelButton } from './PixelButton';
 import {
   Dialog,
@@ -12,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Upload } from 'lucide-react';
 
 interface EssayAdminProps {
   essays: Essay[];
@@ -34,6 +36,8 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
   const [isEditing, setIsEditing] = useState(false);
   const [editingEssay, setEditingEssay] = useState<Essay | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<EssayFormData>({
     title: '',
@@ -162,6 +166,65 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
     onClose();
   };
 
+  const handleUploadToSupabase = async () => {
+    setIsUploading(true);
+    setUploadStatus('Starting upload...');
+    
+    try {
+      const localEssays = essayStorage.getAll();
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const essay of localEssays) {
+        setUploadStatus(`Uploading "${essay.title}"...`);
+        
+        try {
+          // Convert local essay to Supabase format
+          const supabaseEssay = {
+            title: essay.title,
+            content: essay.content,
+            slug: essay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+            published: true,
+            excerpt: essay.preview,
+            tags: essay.tags,
+            category: essay.tags[0] || 'General',
+            reading_time: parseInt(essay.readTime) || 5,
+            published_at: new Date(essay.createdAt).toISOString(),
+          };
+          
+          const result = await essayService.createEssay(supabaseEssay);
+          
+          if (result.data) {
+            successCount++;
+          } else {
+            errorCount++;
+            console.error('Failed to upload essay:', essay.title, result.error);
+          }
+        } catch (error) {
+          errorCount++;
+          console.error('Error uploading essay:', essay.title, error);
+        }
+      }
+      
+      const message = `Upload complete! ${successCount} essays uploaded successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}.`;
+      setUploadStatus(message);
+      
+      // Clear status after 3 seconds
+      setTimeout(() => {
+        setUploadStatus(null);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadStatus('Upload failed. Check console for details.');
+      setTimeout(() => {
+        setUploadStatus(null);
+      }, 3000);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -172,12 +235,27 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
             <PixelButton onClick={handleAdd} className="text-xs px-3">
               Add New
             </PixelButton>
+            <PixelButton 
+              onClick={handleUploadToSupabase} 
+              className="text-xs px-3 flex items-center gap-1"
+              disabled={isUploading}
+            >
+              <Upload size={12} />
+              {isUploading ? 'Uploading...' : 'Upload to DB'}
+            </PixelButton>
             <PixelButton onClick={handleLogout} variant="default" className="text-xs px-2">
               Logout
             </PixelButton>
           </div>
         </div>
       </div>
+
+      {/* Upload Status */}
+      {uploadStatus && (
+        <div className="mac-border-inset bg-cream-50 p-2 mb-2">
+          <div className="text-xs text-center">{uploadStatus}</div>
+        </div>
+      )}
 
       {/* Essays List */}
       <div className="flex-grow overflow-auto mac-border-inset bg-mac-white p-2">

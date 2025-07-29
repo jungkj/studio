@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BookOpen, Edit, LogIn, LogOut, Calendar, Clock, RefreshCw } from 'lucide-react';
+import { BookOpen, Calendar, Clock, RefreshCw } from 'lucide-react';
 import { PixelButton } from './PixelButton';
 import { essayService } from '@/utils/essayService';
-import { useAuth } from '@/hooks/useAuth';
 import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
-import { SeedEssaysButton } from './SeedEssaysButton';
-import { MigrateEssaysButton } from './MigrateEssaysButton';
-import { UploadPlaceholderEssaysButton } from './UploadPlaceholderEssaysButton';
 import { checkSupabaseConnection } from '@/utils/supabaseConfig';
 
 interface EssaysAppProps {
@@ -16,22 +12,11 @@ interface EssaysAppProps {
 
 const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
   const [essays, setEssays] = useState<Essay[]>([]);
-  const [isAdminMode, setIsAdminMode] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [expandedEssay, setExpandedEssay] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('Loading essays...');
 
-  // Auth hook
-  const { 
-    isAuthenticated, 
-    isAdmin, 
-    user, 
-    signInWithEmail, 
-    signOut, 
-    loading: authLoading 
-  } = useAuth();
 
   // Load essays with retry logic
   useEffect(() => {
@@ -201,81 +186,6 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
     return { quote: null, content };
   };
 
-  const handleAuthSubmit = async (email: string, password: string) => {
-    const { error } = await signInWithEmail(email, password);
-    if (!error) {
-      setShowAuthModal(false);
-      if (isAdmin) {
-        setIsAdminMode(true);
-      }
-    }
-    return { error };
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    setIsAdminMode(false);
-  };
-
-  // Simple auth modal
-  const AuthModal = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [authError, setAuthError] = useState('');
-
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      const { error } = await handleAuthSubmit(email, password);
-      if (error) {
-        setAuthError(error.message || 'Authentication failed');
-      }
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-mac-white mac-border-outset p-6 max-w-sm w-full mx-4">
-          <h3 className="text-lg font-bold mb-4 text-mac-black">Admin Sign In</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 mac-border-inset bg-mac-white text-mac-black"
-                required
-              />
-            </div>
-            <div>
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 mac-border-inset bg-mac-white text-mac-black"
-                required
-              />
-            </div>
-            {authError && (
-              <p className="text-red-600 text-sm">{authError}</p>
-            )}
-            <div className="flex gap-2">
-              <PixelButton type="submit" className="flex-1">
-                Sign In
-              </PixelButton>
-              <PixelButton
-                type="button"
-                onClick={() => setShowAuthModal(false)}
-                className="flex-1 bg-mac-medium-gray"
-              >
-                Cancel
-              </PixelButton>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
 
   // Loading state
   if (isLoading) {
@@ -313,8 +223,6 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
 
   return (
     <div className="flex flex-col h-full bg-mac-light-gray mac-system-font">
-      {showAuthModal && <AuthModal />}
-      
       {/* Header */}
       <div className="bg-mac-white mac-border-inset p-4 m-4 mb-2">
         <div className="flex justify-between items-center">
@@ -330,48 +238,15 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
               <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
             </PixelButton>
           </div>
-          
-          {/* Auth controls */}
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2">
-              {isAdmin && (
-                <PixelButton
-                  onClick={() => setIsAdminMode(!isAdminMode)}
-                  className="text-xs px-2 py-1"
-                >
-                  <Edit size={12} className="mr-1" />
-                  {isAdminMode ? 'Exit' : 'Edit'}
-                </PixelButton>
-              )}
-              <PixelButton
-                onClick={handleSignOut}
-                className="text-xs px-2 py-1"
-              >
-                <LogOut size={12} />
-              </PixelButton>
-            </div>
-          ) : (
-            <PixelButton
-              onClick={() => setShowAuthModal(true)}
-              className="text-xs px-2 py-1"
-            >
-              <LogIn size={12} />
-            </PixelButton>
-          )}
         </div>
         
         <p className="text-xs text-mac-dark-gray mt-2">
           Thoughts on technology, life, and everything in between
         </p>
         
-        {/* Admin controls */}
-        {isAdmin && isAdminMode && (
-          <div className="mt-3 pt-3 border-t border-mac-medium-gray space-y-3">
-            <UploadPlaceholderEssaysButton onComplete={refreshEssays} />
-            <MigrateEssaysButton />
-            <SeedEssaysButton />
-          </div>
-        )}
+        <p className="text-xs text-mac-medium-gray mt-2">
+          💡 Tip: Access the Settings panel and log in as admin to manage essays
+        </p>
       </div>
 
       {/* Essays list */}
