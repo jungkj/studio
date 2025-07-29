@@ -16,9 +16,25 @@ const getSupabaseConfig = (): SupabaseConfig => {
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   };
 
-  // Validate required configuration
+  // During build time, we might not have env vars yet
+  if (typeof window === 'undefined' && (!config.url || !config.anonKey)) {
+    console.warn('Supabase configuration missing during build. Using placeholder values.');
+    return {
+      url: 'https://placeholder.supabase.co',
+      anonKey: 'placeholder-key',
+      serviceRoleKey: undefined,
+    };
+  }
+
+  // Validate required configuration for runtime
   if (!config.url || !config.anonKey) {
-    throw new Error('Missing required Supabase configuration. Please check your environment variables.');
+    console.error('Missing required Supabase configuration. Please check your environment variables.');
+    // Return placeholder to prevent app crash
+    return {
+      url: 'https://placeholder.supabase.co',
+      anonKey: 'placeholder-key',
+      serviceRoleKey: undefined,
+    };
   }
 
   return config;
