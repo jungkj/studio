@@ -153,8 +153,8 @@ export const GlobalFollowingPointer = ({
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   
-  // Use spring for smoother animation
-  const springConfig = { damping: 25, stiffness: 700 };
+  // Reduced damping and increased stiffness for more responsive cursor
+  const springConfig = { damping: 15, stiffness: 1500 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 

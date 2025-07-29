@@ -14,7 +14,6 @@ import { MenuBar } from '@/components/MenuBar';
 import { SystemTray } from '@/components/SystemTray';
 import { DesktopIcon } from '@/components/DesktopIcon';
 import { WelcomeWindow } from '@/components/WelcomeWindow';
-import { MacLoadingScreen } from '@/components/MacLoadingScreen';
 import { Clock } from '@/components/Clock';
 import { SettingsModal } from '@/components/SettingsModal';
 import { SimpleCalculator } from '@/components/SimpleCalculator';
@@ -57,7 +56,6 @@ const windowIcons: Record<WindowName, string> = {
 
 const Index = () => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
 
   const [windowStates, setWindowStates] = useState<Record<WindowName, WindowState>>({
     essays: { isOpen: false, zIndex: 10 },
@@ -68,7 +66,7 @@ const Index = () => {
     breakout: { isOpen: false, zIndex: 15 },
     contact: { isOpen: false, zIndex: 16 },
     work: { isOpen: false, zIndex: 17 },
-    welcome: { isOpen: false, zIndex: 18 }, // Start closed until loading completes
+    welcome: { isOpen: true, zIndex: 18 }, // Start with welcome window open
     clock: { isOpen: false, zIndex: 19 },
     calculator: { isOpen: false, zIndex: 20 },
   });
@@ -155,25 +153,6 @@ const Index = () => {
     };
   }, [maxZIndex]);
 
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-    // Open welcome window after loading
-    const newMaxZIndex = maxZIndex + 1;
-    setWindowStates(prev => ({
-      ...prev,
-      welcome: { isOpen: true, zIndex: newMaxZIndex }
-    }));
-    setMaxZIndex(newMaxZIndex);
-    
-    // Emit window open event for welcome window
-    window.dispatchEvent(new CustomEvent('windowOpen', {
-      detail: {
-        name: 'welcome',
-        title: 'Welcome',
-      }
-    }));
-  };
-
 
   const openWindow = (windowName: WindowName) => {
     setWindowStates(prev => {
@@ -235,11 +214,6 @@ const Index = () => {
     { name: 'contact', label: 'Contact', icon: 'Be-Os-Be-Box-Be-Mail-2.32.png', fallback: 'mail' as const },
     { name: 'about', label: 'About Me', icon: 'Be-Os-Be-Box-Be-Sound.32.png', fallback: 'user' as const },
   ];
-
-  // Show loading screen first
-  if (isLoading) {
-    return <MacLoadingScreen onLoadingComplete={handleLoadingComplete} />;
-  }
 
   return (
     <div className="w-screen h-screen mac-desktop-bg flex flex-col relative overflow-hidden">

@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Commit Guidelines
+- DO NOT include Claude attribution in commit messages
+- DO NOT add "🤖 Generated with Claude Code" or "Co-Authored-By: Claude" to commits
+- Keep commit messages clean and professional
+
 ## Commands
 
 ### Development
