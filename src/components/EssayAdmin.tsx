@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Upload } from 'lucide-react';
+import { getSupabaseClient } from '@/utils/supabaseConfig';
+import { useAuth } from '@/hooks/useAuth';
 
 interface EssayAdminProps {
   essays: Essay[];
@@ -38,6 +40,10 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [showSupabaseLogin, setShowSupabaseLogin] = useState(false);
+  const [supabaseEmail, setSupabaseEmail] = useState('');
+  const [supabasePassword, setSupabasePassword] = useState('');
+  const { user, isAuthenticated: isSupabaseAuth, signInWithEmail } = useAuth();
   
   const [formData, setFormData] = useState<EssayFormData>({
     title: '',
@@ -166,7 +172,29 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
     onClose();
   };
 
+  const handleSupabaseLogin = async () => {
+    setUploadStatus('Logging into Supabase...');
+    const { error } = await signInWithEmail(supabaseEmail, supabasePassword);
+    
+    if (error) {
+      setUploadStatus(`Login failed: ${error.message}`);
+      setTimeout(() => setUploadStatus(null), 3000);
+    } else {
+      setShowSupabaseLogin(false);
+      setSupabaseEmail('');
+      setSupabasePassword('');
+      setUploadStatus('Login successful! You can now upload essays.');
+      setTimeout(() => setUploadStatus(null), 3000);
+    }
+  };
+
   const handleUploadToSupabase = async () => {
+    // Check if user is authenticated with Supabase
+    if (!isSupabaseAuth) {
+      setShowSupabaseLogin(true);
+      return;
+    }
+
     setIsUploading(true);
     setUploadStatus('Starting upload...');
     
@@ -239,6 +267,7 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
               onClick={handleUploadToSupabase} 
               className="text-xs px-3 flex items-center gap-1"
               disabled={isUploading}
+              title={isSupabaseAuth ? 'Upload essays to Supabase' : 'Login required'}
             >
               <Upload size={12} />
               {isUploading ? 'Uploading...' : 'Upload to DB'}
@@ -256,6 +285,16 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
           <div className="text-xs text-center">{uploadStatus}</div>
         </div>
       )}
+
+      {/* Supabase Auth Status */}
+      <div className="mac-border-inset bg-mac-light-gray p-2 mb-2">
+        <div className="text-xs flex items-center justify-between">
+          <span>Supabase Status:</span>
+          <span className={isSupabaseAuth ? 'text-green-600' : 'text-red-600'}>
+            {isSupabaseAuth ? `Authenticated as ${user?.email}` : 'Not authenticated'}
+          </span>
+        </div>
+      </div>
 
       {/* Essays List */}
       <div className="flex-grow overflow-auto mac-border-inset bg-mac-white p-2">
@@ -429,6 +468,62 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
               style={{ backgroundColor: 'hsl(var(--destructive))' }}
             >
               Delete
+            </PixelButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Supabase Login Dialog */}
+      <Dialog open={showSupabaseLogin} onOpenChange={setShowSupabaseLogin}>
+        <DialogContent className="mac-system-font bg-mac-white">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-bold">Supabase Authentication Required</DialogTitle>
+            <DialogDescription className="text-xs">
+              Please log in to your Supabase account to upload essays to the database.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="supabase-email" className="text-xs">Email</Label>
+              <Input
+                id="supabase-email"
+                type="email"
+                value={supabaseEmail}
+                onChange={(e) => setSupabaseEmail(e.target.value)}
+                className="mac-system-font text-xs"
+                placeholder="your@email.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="supabase-password" className="text-xs">Password</Label>
+              <Input
+                id="supabase-password"
+                type="password"
+                value={supabasePassword}
+                onChange={(e) => setSupabasePassword(e.target.value)}
+                className="mac-system-font text-xs"
+                placeholder="Enter your password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <PixelButton 
+              onClick={() => {
+                setShowSupabaseLogin(false);
+                setSupabaseEmail('');
+                setSupabasePassword('');
+              }} 
+              variant="default" 
+              className="text-xs px-3"
+            >
+              Cancel
+            </PixelButton>
+            <PixelButton 
+              onClick={handleSupabaseLogin}
+              className="text-xs px-3 apple-blue-button"
+              disabled={!supabaseEmail || !supabasePassword}
+            >
+              Login
             </PixelButton>
           </DialogFooter>
         </DialogContent>
