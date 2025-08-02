@@ -11,9 +11,9 @@ export const MigrateEssaysButton: React.FC = () => {
 
   const migrateEssays = async () => {
     // Check if user is authenticated as admin locally
-    const isAdminAuth = essayStorage.isAdminAuthenticated();
+    const isAdminAuth = essayStorage.checkAdminAuth();
     if (!isAdminAuth) {
-      setMigrationStatus('❌ Admin access required - please log in first');
+      setMigrationStatus('❌ Admin access required - please log in with password mimi123 first');
       return;
     }
 

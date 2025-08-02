@@ -93,9 +93,9 @@ export const UploadPlaceholderEssaysButton: React.FC<{ onComplete?: () => void }
 
   const uploadEssays = async () => {
     // Check if user is authenticated as admin locally
-    const isAdminAuth = essayStorage.isAdminAuthenticated();
+    const isAdminAuth = essayStorage.checkAdminAuth();
     if (!isAdminAuth) {
-      setUploadStatus('❌ Admin access required - please log in first');
+      setUploadStatus('❌ Admin access required - please log in with password mimi123 first');
       return;
     }
 

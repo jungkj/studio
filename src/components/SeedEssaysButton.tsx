@@ -143,7 +143,7 @@ export const SeedEssaysButton: React.FC = () => {
 
     try {
       // Check if user is authenticated as admin locally
-      const isAdminAuth = essayStorage.isAdminAuthenticated();
+      const isAdminAuth = essayStorage.checkAdminAuth();
       if (!isAdminAuth) {
         toast({
           title: "Authentication Required",
