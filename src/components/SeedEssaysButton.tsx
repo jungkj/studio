@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PixelButton } from './PixelButton';
-import { essayService } from '@/utils/essayService';
+import { essayAdminService } from '@/utils/essayAdminService';
+import { essayStorage } from '@/utils/essayStorage';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -141,6 +142,21 @@ export const SeedEssaysButton: React.FC = () => {
     let errorCount = 0;
 
     try {
+      // Check if user is authenticated as admin locally
+      const isAdminAuth = essayStorage.isAdminAuthenticated();
+      if (!isAdminAuth) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in as admin first (password: mimi123)",
+          variant: "destructive",
+        });
+        setIsSeeding(false);
+        return;
+      }
+
+      // Set admin authentication for the service
+      essayAdminService.setAdminAuth(true);
+
       for (const essayData of exampleEssays) {
         const slug = generateSlug(essayData.title);
         const wordCount = essayData.content.split(/\s+/).length;
@@ -159,7 +175,7 @@ export const SeedEssaysButton: React.FC = () => {
           word_count: wordCount,
         };
         
-        const { error } = await essayService.createEssay(essay);
+        const { error } = await essayAdminService.createEssayAsAdmin(essay);
         
         if (error) {
           console.error(`Error creating essay "${essay.title}":`, error);

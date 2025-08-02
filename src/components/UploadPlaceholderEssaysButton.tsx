@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PixelButton } from './PixelButton';
-import { essayService } from '@/utils/essayService';
+import { essayAdminService } from '@/utils/essayAdminService';
+import { essayStorage } from '@/utils/essayStorage';
 import { useAuth } from '@/hooks/useAuth';
 import { EssayInsert } from '@/utils/supabaseTypes';
 
@@ -91,8 +92,10 @@ export const UploadPlaceholderEssaysButton: React.FC<{ onComplete?: () => void }
   const { isAdmin } = useAuth();
 
   const uploadEssays = async () => {
-    if (!isAdmin) {
-      setUploadStatus('❌ Admin access required');
+    // Check if user is authenticated as admin locally
+    const isAdminAuth = essayStorage.isAdminAuthenticated();
+    if (!isAdminAuth) {
+      setUploadStatus('❌ Admin access required - please log in first');
       return;
     }
 
@@ -100,6 +103,8 @@ export const UploadPlaceholderEssaysButton: React.FC<{ onComplete?: () => void }
     setUploadStatus('🔄 Starting upload...');
 
     try {
+      // Set admin authentication for the service
+      essayAdminService.setAdminAuth(true);
       let successCount = 0;
       let errorCount = 0;
 
@@ -107,7 +112,7 @@ export const UploadPlaceholderEssaysButton: React.FC<{ onComplete?: () => void }
         try {
           setUploadStatus(`🔄 Uploading: ${essay.title}`);
           
-          const { error } = await essayService.createEssay(essay);
+          const { error } = await essayAdminService.createEssayAsAdmin(essay);
           
           if (error) {
             console.error(`Error uploading essay "${essay.title}":`, error);

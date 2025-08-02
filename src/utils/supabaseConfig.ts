@@ -59,6 +59,13 @@ export const getSupabaseClient = (): SupabaseClient<Database> => {
         params: {
           eventsPerSecond: 10
         }
+      },
+      global: {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        }
       }
     });
   }
@@ -79,6 +86,13 @@ export const getSupabaseServiceClient = (): SupabaseClient<Database> => {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
+      },
+      global: {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        }
       }
     });
   }

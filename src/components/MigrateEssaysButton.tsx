@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PixelButton } from './PixelButton';
 import { essayStorage } from '@/utils/essayStorage';
-import { essayService } from '@/utils/essayService';
+import { essayAdminService } from '@/utils/essayAdminService';
 import { useAuth } from '@/hooks/useAuth';
 
 export const MigrateEssaysButton: React.FC = () => {
@@ -10,8 +10,10 @@ export const MigrateEssaysButton: React.FC = () => {
   const { isAdmin } = useAuth();
 
   const migrateEssays = async () => {
-    if (!isAdmin) {
-      setMigrationStatus('❌ Admin access required');
+    // Check if user is authenticated as admin locally
+    const isAdminAuth = essayStorage.isAdminAuthenticated();
+    if (!isAdminAuth) {
+      setMigrationStatus('❌ Admin access required - please log in first');
       return;
     }
 
@@ -19,6 +21,8 @@ export const MigrateEssaysButton: React.FC = () => {
     setMigrationStatus('🔄 Starting migration...');
 
     try {
+      // Set admin authentication for the service
+      essayAdminService.setAdminAuth(true);
       // Get essays from local storage
       const localEssays = essayStorage.getAll();
       console.log(`Found ${localEssays.length} essays in local storage`);
@@ -44,7 +48,7 @@ export const MigrateEssaysButton: React.FC = () => {
             published_at: new Date(essay.createdAt).toISOString(),
           };
 
-          const { error } = await essayService.createEssay(supabaseEssay);
+          const { error } = await essayAdminService.createEssayAsAdmin(supabaseEssay);
           
           if (error) {
             console.error(`Error migrating essay "${essay.title}":`, error);
