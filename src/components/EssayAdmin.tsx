@@ -290,8 +290,8 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
       <div className="mac-border-inset bg-mac-light-gray p-2 mb-2">
         <div className="text-xs flex items-center justify-between">
           <span>Supabase Status:</span>
-          <span className={isSupabaseAuth ? 'text-green-600' : 'text-red-600'}>
-            {isSupabaseAuth ? `Authenticated as ${user?.email}` : 'Not authenticated'}
+          <span className={isSupabaseAuth ? 'text-green-600' : 'text-orange-600'}>
+            {isSupabaseAuth ? `Authenticated as ${user?.email}` : 'Login required for upload'}
           </span>
         </div>
       </div>
