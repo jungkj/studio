@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Essay, essayStorage } from '@/utils/essayStorage';
-import { essayService } from '@/utils/essayService';
+import { essayAdminService } from '@/utils/essayAdminService';
 import { PixelButton } from './PixelButton';
 import {
   Dialog,
@@ -14,8 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Upload } from 'lucide-react';
-import { getSupabaseClient } from '@/utils/supabaseConfig';
-import { useAuth } from '@/hooks/useAuth';
 
 interface EssayAdminProps {
   essays: Essay[];
@@ -40,10 +38,6 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [showSupabaseLogin, setShowSupabaseLogin] = useState(false);
-  const [supabaseEmail, setSupabaseEmail] = useState('');
-  const [supabasePassword, setSupabasePassword] = useState('');
-  const { user, isAuthenticated: isSupabaseAuth, signInWithEmail } = useAuth();
   
   const [formData, setFormData] = useState<EssayFormData>({
     title: '',
@@ -172,69 +166,36 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
     onClose();
   };
 
-  const handleSupabaseLogin = async () => {
-    setUploadStatus('Logging into Supabase...');
-    const { error } = await signInWithEmail(supabaseEmail, supabasePassword);
-    
-    if (error) {
-      setUploadStatus(`Login failed: ${error.message}`);
-      setTimeout(() => setUploadStatus(null), 3000);
-    } else {
-      setShowSupabaseLogin(false);
-      setSupabaseEmail('');
-      setSupabasePassword('');
-      setUploadStatus('Login successful! You can now upload essays.');
-      setTimeout(() => setUploadStatus(null), 3000);
-    }
-  };
 
   const handleUploadToSupabase = async () => {
-    // Check if user is authenticated with Supabase
-    if (!isSupabaseAuth) {
-      setShowSupabaseLogin(true);
-      return;
-    }
-
     setIsUploading(true);
     setUploadStatus('Starting upload...');
     
     try {
-      const localEssays = essayStorage.getAll();
-      let successCount = 0;
-      let errorCount = 0;
+      // Set admin authentication for the service
+      essayAdminService.setAdminAuth(true);
       
-      for (const essay of localEssays) {
-        setUploadStatus(`Uploading "${essay.title}"...`);
-        
-        try {
-          // Convert local essay to Supabase format
-          const supabaseEssay = {
-            title: essay.title,
-            content: essay.content,
-            slug: essay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-            published: true,
-            excerpt: essay.preview,
-            tags: essay.tags,
-            category: essay.tags[0] || 'General',
-            reading_time: parseInt(essay.readTime) || 5,
-            published_at: new Date(essay.createdAt).toISOString(),
-          };
-          
-          const result = await essayService.createEssay(supabaseEssay);
-          
-          if (result.data) {
-            successCount++;
-          } else {
-            errorCount++;
-            console.error('Failed to upload essay:', essay.title, result.error);
-          }
-        } catch (error) {
-          errorCount++;
-          console.error('Error uploading essay:', essay.title, error);
-        }
+      const localEssays = essayStorage.getAll();
+      const essaysToUpload = localEssays.map(essay => ({
+        title: essay.title,
+        content: essay.content,
+        slug: essay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+        published: true,
+        excerpt: essay.preview,
+        tags: essay.tags,
+        category: essay.tags[0] || 'General',
+        reading_time: parseInt(essay.readTime) || 5,
+        published_at: new Date(essay.createdAt).toISOString(),
+      }));
+      
+      const result = await essayAdminService.bulkUploadEssays(essaysToUpload);
+      
+      const message = `Upload complete! ${result.successful} essays uploaded successfully${result.failed > 0 ? `, ${result.failed} failed` : ''}.`;
+      
+      if (result.errors.length > 0) {
+        console.error('Upload errors:', result.errors);
       }
       
-      const message = `Upload complete! ${successCount} essays uploaded successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}.`;
       setUploadStatus(message);
       
       // Clear status after 3 seconds
@@ -267,7 +228,7 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
               onClick={handleUploadToSupabase} 
               className="text-xs px-3 flex items-center gap-1"
               disabled={isUploading}
-              title={isSupabaseAuth ? 'Upload essays to Supabase' : 'Login required'}
+              title="Upload essays to Supabase database"
             >
               <Upload size={12} />
               {isUploading ? 'Uploading...' : 'Upload to DB'}
@@ -286,15 +247,6 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
         </div>
       )}
 
-      {/* Supabase Auth Status */}
-      <div className="mac-border-inset bg-mac-light-gray p-2 mb-2">
-        <div className="text-xs flex items-center justify-between">
-          <span>Supabase Status:</span>
-          <span className={isSupabaseAuth ? 'text-green-600' : 'text-orange-600'}>
-            {isSupabaseAuth ? `Authenticated as ${user?.email}` : 'Login required for upload'}
-          </span>
-        </div>
-      </div>
 
       {/* Essays List */}
       <div className="flex-grow overflow-auto mac-border-inset bg-mac-white p-2">
@@ -473,61 +425,6 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
         </DialogContent>
       </Dialog>
 
-      {/* Supabase Login Dialog */}
-      <Dialog open={showSupabaseLogin} onOpenChange={setShowSupabaseLogin}>
-        <DialogContent className="mac-system-font bg-mac-white">
-          <DialogHeader>
-            <DialogTitle className="text-sm font-bold">Supabase Authentication Required</DialogTitle>
-            <DialogDescription className="text-xs">
-              Please log in to your Supabase account to upload essays to the database.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="supabase-email" className="text-xs">Email</Label>
-              <Input
-                id="supabase-email"
-                type="email"
-                value={supabaseEmail}
-                onChange={(e) => setSupabaseEmail(e.target.value)}
-                className="mac-system-font text-xs"
-                placeholder="your@email.com"
-              />
-            </div>
-            <div>
-              <Label htmlFor="supabase-password" className="text-xs">Password</Label>
-              <Input
-                id="supabase-password"
-                type="password"
-                value={supabasePassword}
-                onChange={(e) => setSupabasePassword(e.target.value)}
-                className="mac-system-font text-xs"
-                placeholder="Enter your password"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <PixelButton 
-              onClick={() => {
-                setShowSupabaseLogin(false);
-                setSupabaseEmail('');
-                setSupabasePassword('');
-              }} 
-              variant="default" 
-              className="text-xs px-3"
-            >
-              Cancel
-            </PixelButton>
-            <PixelButton 
-              onClick={handleSupabaseLogin}
-              className="text-xs px-3 apple-blue-button"
-              disabled={!supabaseEmail || !supabasePassword}
-            >
-              Login
-            </PixelButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
