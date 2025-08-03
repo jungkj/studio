@@ -251,6 +251,131 @@ export class EssayAdminService {
       return { error: 'Failed to delete essay' };
     }
   }
+
+  /**
+   * Delete multiple essays by their slugs
+   */
+  async deleteEssaysBySlugs(slugs: string[]): Promise<{ 
+    successful: number; 
+    failed: number; 
+    errors: Array<{ slug: string; error: string }> 
+  }> {
+    let successful = 0;
+    let failed = 0;
+    const errors: Array<{ slug: string; error: string }> = [];
+
+    for (const slug of slugs) {
+      try {
+        const { error } = await this.supabase
+          .from('essays')
+          .delete()
+          .eq('slug', slug);
+
+        if (error) {
+          failed++;
+          errors.push({ slug, error: error.message });
+          console.error(`Error deleting essay with slug "${slug}":`, error);
+        } else {
+          successful++;
+          console.log(`Successfully deleted essay with slug: ${slug}`);
+        }
+      } catch (error) {
+        failed++;
+        errors.push({ slug, error: 'Exception during deletion' });
+        console.error(`Exception deleting essay with slug "${slug}":`, error);
+      }
+    }
+
+    return { successful, failed, errors };
+  }
+
+  /**
+   * Sync local essays with database (handles both uploads and deletions)
+   */
+  async syncEssaysWithDatabase(
+    localEssays: Array<any>,
+    deletedIds: string[]
+  ): Promise<{
+    uploads: { successful: number; failed: number };
+    deletions: { successful: number; failed: number };
+    errors: Array<{ operation: string; item: string; error: string }>;
+  }> {
+    const results = {
+      uploads: { successful: 0, failed: 0 },
+      deletions: { successful: 0, failed: 0 },
+      errors: [] as Array<{ operation: string; item: string; error: string }>
+    };
+
+    // First, handle deletions
+    if (deletedIds.length > 0) {
+      console.log(`Processing ${deletedIds.length} deletions...`);
+      
+      // Get all essays from database to find the slugs for deleted IDs
+      const { data: dbEssays } = await this.getEssays({ limit: 1000 });
+      
+      // Map deleted IDs to slugs (assuming IDs are based on timestamps)
+      const slugsToDelete: string[] = [];
+      
+      // For each deleted ID, try to find corresponding essay by matching criteria
+      for (const deletedId of deletedIds) {
+        // Since local IDs are timestamps, we need to match by other criteria
+        // We'll delete essays that aren't in the local list
+        const deletedEssay = dbEssays?.find(dbEssay => {
+          // Check if this DB essay exists in local essays
+          const existsLocally = localEssays.some(localEssay => 
+            localEssay.title === dbEssay.title || 
+            localEssay.slug === dbEssay.slug
+          );
+          return !existsLocally;
+        });
+        
+        if (deletedEssay?.slug) {
+          slugsToDelete.push(deletedEssay.slug);
+        }
+      }
+      
+      if (slugsToDelete.length > 0) {
+        const deleteResult = await this.deleteEssaysBySlugs(slugsToDelete);
+        results.deletions.successful = deleteResult.successful;
+        results.deletions.failed = deleteResult.failed;
+        
+        deleteResult.errors.forEach(err => {
+          results.errors.push({
+            operation: 'delete',
+            item: err.slug,
+            error: err.error
+          });
+        });
+      }
+    }
+
+    // Then handle uploads/updates
+    const essaysToUpload = localEssays.map(essay => ({
+      title: essay.title,
+      content: essay.content,
+      slug: essay.slug || essay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+      published: true,
+      excerpt: essay.preview || essay.excerpt,
+      tags: essay.tags,
+      category: essay.tags?.[0] || 'General',
+      reading_time: parseInt(essay.readTime) || 5,
+      published_at: essay.publishedAt || new Date(essay.createdAt).toISOString(),
+    }));
+
+    const uploadResult = await this.bulkUploadEssays(essaysToUpload);
+    results.uploads.successful = uploadResult.successful;
+    results.uploads.failed = uploadResult.failed;
+
+    uploadResult.errors.forEach(err => {
+      results.errors.push({
+        operation: 'upload',
+        item: err.title,
+        error: err.error
+      });
+    });
+
+    return results;
+  }
 }
 
 // Export singleton instance

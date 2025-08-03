@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Essay, essayStorage } from '@/utils/essayStorage';
 import { essayAdminService } from '@/utils/essayAdminService';
 import { PixelButton } from './PixelButton';
@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Upload } from 'lucide-react';
+import { Upload, AlertCircle } from 'lucide-react';
 
 interface EssayAdminProps {
   essays: Essay[];
@@ -38,6 +38,41 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [syncPreview, setSyncPreview] = useState<{ toDelete: number; toUpload: number } | null>(null);
+  
+  // Check sync status on mount and after changes
+  useEffect(() => {
+    const checkSyncStatus = async () => {
+      try {
+        // Set admin auth for the check
+        essayAdminService.setAdminAuth(true);
+        
+        // Get database essays count
+        const { data: dbEssays } = await essayAdminService.getEssays({ limit: 1000 });
+        const dbCount = dbEssays?.length || 0;
+        const localCount = essays.length;
+        
+        // Estimate changes (this is approximate)
+        const toDelete = Math.max(0, dbCount - localCount);
+        const toUpload = Math.max(0, localCount - dbCount);
+        
+        if (toDelete > 0 || toUpload > 0) {
+          setSyncPreview({ toDelete, toUpload });
+        } else {
+          setSyncPreview(null);
+        }
+      } catch (error) {
+        console.error('Failed to check sync status:', error);
+        // Don't show sync preview if we can't connect
+        setSyncPreview(null);
+      }
+    };
+    
+    // Only check if we have admin auth
+    if (essayStorage.checkAdminAuth()) {
+      checkSyncStatus();
+    }
+  }, [essays]);
   
   const [formData, setFormData] = useState<EssayFormData>({
     title: '',
@@ -169,46 +204,114 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
 
   const handleUploadToSupabase = async () => {
     setIsUploading(true);
-    setUploadStatus('Starting upload...');
+    setUploadStatus('Starting sync...');
     
     try {
       // Set admin authentication for the service
       essayAdminService.setAdminAuth(true);
       
+      // Get current state
       const localEssays = essayStorage.getAll();
-      const essaysToUpload = localEssays.map(essay => ({
-        title: essay.title,
-        content: essay.content,
-        slug: essay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-        published: true,
-        excerpt: essay.preview,
-        tags: essay.tags,
-        category: essay.tags[0] || 'General',
-        reading_time: parseInt(essay.readTime) || 5,
-        published_at: new Date(essay.createdAt).toISOString(),
-      }));
+      const deletedIds = essayStorage.getDeletedEssayIds();
       
-      const result = await essayAdminService.bulkUploadEssays(essaysToUpload);
+      setUploadStatus('Fetching database essays...');
       
-      const message = `Upload complete! ${result.successful} essays uploaded successfully${result.failed > 0 ? `, ${result.failed} failed` : ''}.`;
+      // Get all essays from database
+      const { data: dbEssays, error: fetchError } = await essayAdminService.getEssays({ limit: 1000 });
       
-      if (result.errors.length > 0) {
-        console.error('Upload errors:', result.errors);
+      if (fetchError) {
+        throw new Error(`Failed to fetch database essays: ${fetchError}`);
       }
+      
+      let uploadCount = 0;
+      let updateCount = 0;
+      let deleteCount = 0;
+      let errorCount = 0;
+      
+      // Process deletions: Delete DB essays that don't exist locally
+      if (dbEssays && dbEssays.length > 0) {
+        setUploadStatus('Processing deletions...');
+        
+        for (const dbEssay of dbEssays) {
+          // Check if this DB essay exists in local storage
+          const existsLocally = localEssays.some(localEssay => 
+            localEssay.title === dbEssay.title
+          );
+          
+          if (!existsLocally && dbEssay.slug) {
+            // Essay exists in DB but not locally, so delete it
+            const { error } = await essayAdminService.deleteEssay(dbEssay.id);
+            if (error) {
+              console.error(`Failed to delete essay "${dbEssay.title}":`, error);
+              errorCount++;
+            } else {
+              console.log(`Deleted essay: ${dbEssay.title}`);
+              deleteCount++;
+            }
+          }
+        }
+      }
+      
+      // Process uploads: Add local essays to database
+      setUploadStatus('Processing uploads...');
+      
+      for (const localEssay of localEssays) {
+        const essayData = {
+          title: localEssay.title,
+          content: localEssay.content,
+          slug: localEssay.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+          published: true,
+          excerpt: localEssay.preview,
+          tags: localEssay.tags,
+          category: localEssay.tags[0] || 'General',
+          reading_time: parseInt(localEssay.readTime) || 5,
+          published_at: new Date(localEssay.createdAt).toISOString(),
+        };
+        
+        const { error } = await essayAdminService.createEssayAsAdmin(essayData);
+        
+        if (error) {
+          if (error.includes('already exists')) {
+            // Essay already exists, could update it here if needed
+            updateCount++;
+          } else {
+            console.error(`Failed to upload essay "${localEssay.title}":`, error);
+            errorCount++;
+          }
+        } else {
+          uploadCount++;
+          // Mark as synced
+          essayStorage.markAsSynced(localEssay.id);
+        }
+      }
+      
+      // Clear deletion tracking since we've processed them
+      essayStorage.clearDeletedTracking();
+      
+      // Build status message
+      const operations = [];
+      if (uploadCount > 0) operations.push(`${uploadCount} uploaded`);
+      if (updateCount > 0) operations.push(`${updateCount} already exist`);
+      if (deleteCount > 0) operations.push(`${deleteCount} deleted`);
+      if (errorCount > 0) operations.push(`${errorCount} errors`);
+      
+      const message = operations.length > 0 
+        ? `Sync complete: ${operations.join(', ')}`
+        : 'Sync complete: No changes';
       
       setUploadStatus(message);
       
-      // Clear status after 3 seconds
+      // Clear status after 5 seconds
       setTimeout(() => {
         setUploadStatus(null);
-      }, 3000);
+      }, 5000);
       
     } catch (error) {
-      console.error('Upload error:', error);
-      setUploadStatus('Upload failed. Check console for details.');
+      console.error('Sync error:', error);
+      setUploadStatus('Sync failed. Check console for details.');
       setTimeout(() => {
         setUploadStatus(null);
-      }, 3000);
+      }, 5000);
     } finally {
       setIsUploading(false);
     }
@@ -228,10 +331,10 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
               onClick={handleUploadToSupabase} 
               className="text-xs px-3 flex items-center gap-1"
               disabled={isUploading}
-              title="Upload essays to Supabase database"
+              title="Sync local changes with database (uploads & deletions)"
             >
               <Upload size={12} />
-              {isUploading ? 'Uploading...' : 'Upload to DB'}
+              {isUploading ? 'Syncing...' : 'Sync with DB'}
             </PixelButton>
             <PixelButton onClick={handleLogout} variant="default" className="text-xs px-2">
               Logout
@@ -244,6 +347,20 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
       {uploadStatus && (
         <div className="mac-border-inset bg-cream-50 p-2 mb-2">
           <div className="text-xs text-center">{uploadStatus}</div>
+        </div>
+      )}
+
+      {/* Sync Preview */}
+      {syncPreview && !uploadStatus && (
+        <div className="mac-border-inset bg-yellow-50 p-2 mb-2">
+          <div className="text-xs flex items-center justify-center gap-2">
+            <AlertCircle size={12} className="text-yellow-600" />
+            <span>
+              Pending sync: 
+              {syncPreview.toUpload > 0 && ` ${syncPreview.toUpload} to upload`}
+              {syncPreview.toDelete > 0 && ` ${syncPreview.toDelete} to delete`}
+            </span>
+          </div>
         </div>
       )}
 

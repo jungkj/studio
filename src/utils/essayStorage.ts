@@ -12,6 +12,8 @@ export interface Essay {
 
 const STORAGE_KEY = 'andy-essays';
 const ADMIN_AUTH_KEY = 'andy-admin-auth';
+const DELETED_ESSAYS_KEY = 'andy-essays-deleted';
+const SYNCED_ESSAYS_KEY = 'andy-essays-synced';
 
 // Default essays data
 const defaultEssays: Essay[] = [
@@ -143,6 +145,12 @@ export const essayStorage = {
     const essays = this.getAll();
     const filtered = essays.filter(e => e.id !== id);
     if (filtered.length === essays.length) return false;
+    
+    // Track deletion if essay was previously synced
+    if (this.isSynced(id)) {
+      this.trackDeletion(id);
+    }
+    
     this.saveAll(filtered);
     return true;
   },
@@ -167,6 +175,66 @@ export const essayStorage = {
   clearAdminAuth(): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     localStorage.removeItem(ADMIN_AUTH_KEY);
+  },
+
+  // Track deleted essays for sync
+  trackDeletion(essayId: string): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    const deletedStr = localStorage.getItem(DELETED_ESSAYS_KEY);
+    const deleted = deletedStr ? JSON.parse(deletedStr) : [];
+    if (!deleted.includes(essayId)) {
+      deleted.push(essayId);
+      localStorage.setItem(DELETED_ESSAYS_KEY, JSON.stringify(deleted));
+    }
+  },
+
+  // Get list of deleted essay IDs
+  getDeletedEssayIds(): string[] {
+    if (typeof window === 'undefined' || !window.localStorage) return [];
+    const deletedStr = localStorage.getItem(DELETED_ESSAYS_KEY);
+    return deletedStr ? JSON.parse(deletedStr) : [];
+  },
+
+  // Clear deleted essays tracking after sync
+  clearDeletedTracking(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    localStorage.removeItem(DELETED_ESSAYS_KEY);
+  },
+
+  // Track which essays have been synced to database
+  markAsSynced(essayId: string): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    const syncedStr = localStorage.getItem(SYNCED_ESSAYS_KEY);
+    const synced = syncedStr ? JSON.parse(syncedStr) : [];
+    if (!synced.includes(essayId)) {
+      synced.push(essayId);
+      localStorage.setItem(SYNCED_ESSAYS_KEY, JSON.stringify(synced));
+    }
+  },
+
+  // Check if essay has been synced
+  isSynced(essayId: string): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
+    const syncedStr = localStorage.getItem(SYNCED_ESSAYS_KEY);
+    const synced = syncedStr ? JSON.parse(syncedStr) : [];
+    return synced.includes(essayId);
+  },
+
+  // Get sync status for all essays
+  getSyncStatus(): { synced: string[], unsynced: string[], deleted: string[] } {
+    const allEssays = this.getAll();
+    const syncedIds = JSON.parse(localStorage.getItem(SYNCED_ESSAYS_KEY) || '[]');
+    const deletedIds = this.getDeletedEssayIds();
+    
+    const unsynced = allEssays
+      .filter(essay => !syncedIds.includes(essay.id))
+      .map(essay => essay.id);
+    
+    return {
+      synced: syncedIds,
+      unsynced,
+      deleted: deletedIds
+    };
   }
 };
 
