@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Essay, essayStorage } from '@/utils/essayStorage';
 import { essayAdminService } from '@/utils/essayAdminService';
 import { PixelButton } from './PixelButton';
+import RichTextEditor from './RichTextEditor';
+import { migrateEssaysContent, getEssaysNeedingMigration } from '@/utils/contentMigration';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +41,8 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [syncPreview, setSyncPreview] = useState<{ toDelete: number; toUpload: number } | null>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationStatus, setMigrationStatus] = useState<string | null>(null);
   
   // Check sync status on mount and after changes
   useEffect(() => {
@@ -201,6 +205,53 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
     onClose();
   };
 
+  const handleMigrateContent = () => {
+    setIsMigrating(true);
+    setMigrationStatus('Checking essays for migration...');
+    
+    try {
+      const essaysNeedingMigration = getEssaysNeedingMigration(essays);
+      
+      if (essaysNeedingMigration.length === 0) {
+        setMigrationStatus('All essays are already in HTML format!');
+        setTimeout(() => {
+          setMigrationStatus(null);
+        }, 3000);
+        setIsMigrating(false);
+        return;
+      }
+
+      setMigrationStatus(`Migrating ${essaysNeedingMigration.length} essays to HTML format...`);
+      
+      // Migrate content
+      const migratedEssays = migrateEssaysContent(essays);
+      
+      // Update storage
+      migratedEssays.forEach(essay => {
+        essayStorage.update(essay.id, essay);
+      });
+      
+      // Update state
+      const updatedEssays = essayStorage.getAll();
+      onEssaysChange(updatedEssays);
+      
+      setMigrationStatus(`Successfully migrated ${essaysNeedingMigration.length} essays to HTML format!`);
+      
+      setTimeout(() => {
+        setMigrationStatus(null);
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Migration error:', error);
+      setMigrationStatus('Migration failed. Please try again.');
+      setTimeout(() => {
+        setMigrationStatus(null);
+      }, 5000);
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
 
   const handleUploadToSupabase = async () => {
     setIsUploading(true);
@@ -328,6 +379,14 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
               Add New
             </PixelButton>
             <PixelButton 
+              onClick={handleMigrateContent} 
+              className="text-xs px-3"
+              disabled={isMigrating}
+              title="Convert plain text essays to rich HTML format"
+            >
+              {isMigrating ? 'Migrating...' : 'Migrate to HTML'}
+            </PixelButton>
+            <PixelButton 
               onClick={handleUploadToSupabase} 
               className="text-xs px-3 flex items-center gap-1"
               disabled={isUploading}
@@ -347,6 +406,13 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
       {uploadStatus && (
         <div className="mac-border-inset bg-cream-50 p-2 mb-2">
           <div className="text-xs text-center">{uploadStatus}</div>
+        </div>
+      )}
+
+      {/* Migration Status */}
+      {migrationStatus && (
+        <div className="mac-border-inset bg-blue-50 p-2 mb-2">
+          <div className="text-xs text-center">{migrationStatus}</div>
         </div>
       )}
 
@@ -497,11 +563,10 @@ const EssayAdmin: React.FC<EssayAdminProps> = ({ essays, onEssaysChange, onClose
             
             <div>
               <Label htmlFor="content" className="text-xs">Content</Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({...formData, content: e.target.value})}
-                rows={12}
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) => setFormData({...formData, content})}
+                placeholder="Start writing your essay..."
                 className="mac-system-font text-xs"
               />
             </div>

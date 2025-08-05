@@ -5,6 +5,7 @@ import { essayService } from '@/utils/essayService';
 import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
 import { checkSupabaseConnection } from '@/utils/supabaseConfig';
+import DOMPurify from 'dompurify';
 
 interface EssaysAppProps {
   onClose: () => void;
@@ -13,6 +14,38 @@ interface EssaysAppProps {
 const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
   const [essays, setEssays] = useState<Essay[]>([]);
   const [expandedEssay, setExpandedEssay] = useState<string | null>(null);
+  
+  // Helper function to safely render content (HTML or plain text)
+  const renderContent = (content: string, maxLength: number = 1000) => {
+    // Check if content contains HTML tags
+    const hasHtmlTags = /<[^>]*>/g.test(content);
+    
+    if (hasHtmlTags) {
+      // Sanitize HTML content
+      const sanitizedContent = DOMPurify.sanitize(content);
+      const truncatedContent = sanitizedContent.length > maxLength 
+        ? sanitizedContent.substring(0, maxLength) + '...' 
+        : sanitizedContent;
+      
+      return (
+        <div 
+          className="text-xs leading-relaxed text-mac-black prose prose-xs max-w-none"
+          dangerouslySetInnerHTML={{ __html: truncatedContent }}
+        />
+      );
+    } else {
+      // Handle plain text content (backward compatibility)
+      const truncatedContent = content.length > maxLength 
+        ? content.substring(0, maxLength) + '...' 
+        : content;
+      
+      return (
+        <p className="text-xs leading-relaxed text-mac-black whitespace-pre-line">
+          {truncatedContent}
+        </p>
+      );
+    }
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('Loading essays...');
@@ -308,10 +341,7 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
                         </div>
                       )}
                       <div className="bg-mac-light-gray mac-border-inset p-3">
-                        <p className="text-xs leading-relaxed text-mac-black whitespace-pre-line">
-                          {content.substring(0, 1000)}
-                          {content.length > 1000 && '...'}
-                        </p>
+                        {renderContent(content, 1000)}
                       </div>
                       <div className="mt-3 text-center">
                         <span className="text-xs text-mac-dark-gray">
