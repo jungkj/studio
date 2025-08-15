@@ -11,27 +11,27 @@ const WorkApp: React.FC<WorkAppProps> = ({ onClose }) => {
   const projects = [
     {
       icon: Code,
+      title: 'Mac Portfolio',
+      status: '🔥 Live Project',
+      description: 'Interactive portfolio website featuring an authentic vintage Mac OS System 7 experience. Complete with draggable windows, realistic UI elements, desktop icons, and retro styling that captures the nostalgic feel of classic computing.',
+      technologies: ['Next.js 15.4.1', 'React 18', 'TypeScript', 'Tailwind CSS', 'TT New Pixel Font'],
+      link: 'https://www.andyjung.tech',
+    },
+    {
+      icon: Briefcase,
+      title: 'Riscura GRC Platform',
+      status: '💼 Enterprise Platform',
+      description: 'Comprehensive AI-powered Governance, Risk, and Compliance platform built for enterprise-scale security and performance. Features risk management, control testing, compliance assessments, and AI-driven insights with support for SOC 2, ISO 27001, PCI DSS, HIPAA, and GDPR frameworks.',
+      technologies: ['Next.js 15.4.5', 'PostgreSQL', 'Prisma ORM', 'OpenAI GPT-4', 'Anthropic Claude', 'DaisyUI', 'Redis'],
+      link: 'https://www.riscura.app',
+    },
+    {
+      icon: Code,
       title: 'This Retro Mac Site',
       status: '🔥 Live Project',
       description: 'You\'re looking at it! Built this entire vintage Mac experience from scratch because I was bored of template portfolios. Features authentic System 7 styling, draggable windows, and that sweet startup sequence.',
       technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Vintage Vibes'],
       link: 'https://github.com/yourusername/portfolio',
-    },
-    {
-      icon: Code,
-      title: 'FinTech Dashboard',
-      status: '💼 Professional Work',
-      description: 'Built a real-time trading dashboard for a startup that processed $2M+ in daily transactions. Clean UI, fast data updates, zero downtime during market hours.',
-      technologies: ['React', 'Python', 'FastAPI', 'WebSockets'],
-      link: '#',
-    },
-    {
-      icon: Code,
-      title: 'Campus Food Tracker',
-      status: '🎓 College Project',
-      description: 'Created an app that helped BC students avoid dining hall lines. Got 500+ users in the first week because nobody likes waiting for mediocre pasta.',
-      technologies: ['React Native', 'Node.js', 'MongoDB'],
-      link: '#',
     },
     {
       icon: Image,

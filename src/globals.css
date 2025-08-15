@@ -41,8 +41,9 @@
     font-family: 'TT New Pixel', 'TT New Pixel Square', Monaco, Menlo, "Courier New", monospace;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: unset;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.4;
+    letter-spacing: 0.5px;
   }
   
   /* Override any pixel font usage by default */
@@ -245,6 +246,7 @@ textarea,
     /* Remove smooth font rendering for pixelated look */
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: unset;
+    letter-spacing: 0.5px;
   }
 }
 
@@ -596,8 +598,9 @@ input[type="range"]::-moz-range-thumb {
 /* Vintage Mac fonts */
 .mac-system-font {
   font-family: 'TT New Pixel', 'TT New Pixel Square', 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
+  letter-spacing: 0.5px;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
 }
