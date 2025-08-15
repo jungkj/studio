@@ -20,12 +20,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Set Monaco/system font as the default sans-serif font
-        sans: ['Monaco', 'Menlo', '"Courier New"', 'monospace'],
-        // Keep pixel font available for special use cases
-        pixel: ['"Press Start 2P"', 'cursive'],
+        // Set TT New Pixel as the default sans-serif font
+        sans: ['"TT New Pixel"', '"TT New Pixel Square"', 'Monaco', 'Menlo', '"Courier New"', 'monospace'],
+        // TT New Pixel fonts
+        pixel: ['"TT New Pixel"', '"TT New Pixel Square"', 'Monaco', 'Menlo', '"Courier New"', 'monospace'],
         // System font alias
-        system: ['Monaco', 'Menlo', '"Courier New"', 'monospace'],
+        system: ['"TT New Pixel"', '"TT New Pixel Square"', 'Monaco', 'Menlo', '"Courier New"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

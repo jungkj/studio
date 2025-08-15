@@ -20,7 +20,7 @@ export const StyleGuide: React.FC = () => {
           <div>
             <span className="text-xs text-mac-dark-gray">Primary Font (Pixel):</span>
             <p style={{ fontFamily: designTokens.typography.fontFamily.primary }}>
-              Press Start 2P - Used for retro gaming elements
+              TT New Pixel - Used for retro gaming elements
             </p>
           </div>
           

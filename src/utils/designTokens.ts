@@ -2,10 +2,10 @@ export const designTokens = {
   // Typography
   typography: {
     fontFamily: {
-      primary: 'Monaco, Menlo, "Courier New", monospace',
-      system: 'Monaco, Menlo, "Courier New", monospace',
-      mono: 'Monaco, Menlo, "Courier New", monospace',
-      pixel: '"Press Start 2P", cursive', // Keep for special cases only
+      primary: '"TT New Pixel", "TT New Pixel Square", Monaco, Menlo, "Courier New", monospace',
+      system: '"TT New Pixel", "TT New Pixel Square", Monaco, Menlo, "Courier New", monospace',
+      mono: '"TT New Pixel", "TT New Pixel Square", Monaco, Menlo, "Courier New", monospace',
+      pixel: '"TT New Pixel", "TT New Pixel Square", Monaco, Menlo, "Courier New", monospace', // TT New Pixel font
     },
     fontSize: {
       '2xs': '0.625rem',    // 10px

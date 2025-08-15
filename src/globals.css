@@ -2,12 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* TT New Pixel Font Face Declarations */
+@font-face {
+  font-family: 'TT New Pixel';
+  src: url('/fonts/thatthatnewpixelfamilytest-round.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT New Pixel';
+  src: url('/fonts/thatthatnewpixelfamilytest-italicround.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT New Pixel Square';
+  src: url('/fonts/thatthatnewpixelfamilytest-square.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TT New Pixel Square';
+  src: url('/fonts/thatthatnewpixelfamilytest-italicsquare.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* Global font styles for consistency */
 @layer base {
   html, body {
-    font-family: Monaco, Menlo, "Courier New", monospace;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'TT New Pixel', 'TT New Pixel Square', Monaco, Menlo, "Courier New", monospace;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
     font-size: 14px;
     line-height: 1.4;
   }
@@ -207,9 +240,10 @@ textarea,
 
   body {
     /* Apply pixel font to body */
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
+    font-family: 'TT New Pixel', 'TT New Pixel Square', Monaco, Menlo, "Courier New", monospace;
     /* Remove smooth font rendering for pixelated look */
-    -webkit-font-smoothing: unset;
+    -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: unset;
   }
 }
@@ -561,11 +595,11 @@ input[type="range"]::-moz-range-thumb {
 
 /* Vintage Mac fonts */
 .mac-system-font {
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-family: 'TT New Pixel', 'TT New Pixel Square', 'Monaco', 'Menlo', 'Courier New', monospace;
   font-size: 14px;
   line-height: 1.4;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 /* Remove old custom styles */
