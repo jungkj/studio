@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Window } from '@/components/Window';
 import { EssaysApp } from '@/components/EssaysApp';
+import { EssayViewer } from '@/components/EssayViewer';
 import { AboutApp } from '@/components/AboutApp';
 import { MyComputerApp } from '@/components/MyComputerApp';
 import { GamesLauncherApp } from '@/components/GamesLauncherApp';
@@ -18,12 +19,20 @@ import { Clock } from '@/components/Clock';
 import { SettingsModal } from '@/components/SettingsModal';
 import { SimpleCalculator } from '@/components/SimpleCalculator';
 import { useToast } from '@/components/ui/use-toast';
+import { Essay } from '@/utils/supabaseTypes';
 
 type WindowName = 'essays' | 'about' | 'myComputer' | 'gamesLauncher' | 'chess' | 'breakout' | 'contact' | 'work' | 'welcome' | 'clock' | 'calculator';
+type EssayWindowName = `essay-${string}`;
 
 interface WindowState {
   isOpen: boolean;
   zIndex: number;
+}
+
+interface EssayWindowState {
+  isOpen: boolean;
+  zIndex: number;
+  essay: Essay;
 }
 
 const windowTitles: Record<WindowName, string> = {
@@ -72,6 +81,7 @@ const Index = () => {
   });
 
   const [maxZIndex, setMaxZIndex] = useState(24);
+  const [essayWindows, setEssayWindows] = useState<Record<string, EssayWindowState>>({});
   const [showSettings, setShowSettings] = useState(false);
   const prevWindowStatesRef = useRef<Record<WindowName, WindowState>>(windowStates);
 
@@ -204,6 +214,61 @@ const Index = () => {
     });
   };
 
+  // Essay window management
+  const openEssayWindow = (essay: Essay) => {
+    const windowId = `essay-${essay.id}`;
+    
+    setEssayWindows(prev => {
+      // If window is already open, just focus it
+      if (prev[windowId]?.isOpen) {
+        const newMaxZIndex = maxZIndex + 1;
+        setMaxZIndex(newMaxZIndex);
+        return {
+          ...prev,
+          [windowId]: { ...prev[windowId], zIndex: newMaxZIndex }
+        };
+      }
+      
+      const newMaxZIndex = maxZIndex + 1;
+      setMaxZIndex(newMaxZIndex);
+      
+      return {
+        ...prev,
+        [windowId]: {
+          isOpen: true,
+          zIndex: newMaxZIndex,
+          essay
+        }
+      };
+    });
+  };
+
+  const closeEssayWindow = (essayId: string) => {
+    const windowId = `essay-${essayId}`;
+    setEssayWindows(prev => ({
+      ...prev,
+      [windowId]: { ...prev[windowId], isOpen: false }
+    }));
+  };
+
+  const focusEssayWindow = (essayId: string) => {
+    const windowId = `essay-${essayId}`;
+    setEssayWindows(prev => {
+      if (!prev[windowId]?.isOpen) return prev;
+      
+      const currentZIndex = prev[windowId].zIndex;
+      if (currentZIndex === maxZIndex) return prev;
+      
+      const newMaxZIndex = maxZIndex + 1;
+      setMaxZIndex(newMaxZIndex);
+      
+      return {
+        ...prev,
+        [windowId]: { ...prev[windowId], zIndex: newMaxZIndex }
+      };
+    });
+  };
+
 
 
   const iconBaseUrl = "/icons";
@@ -272,7 +337,7 @@ const Index = () => {
             zIndex={windowStates.essays.zIndex} 
             onFocus={() => focusWindow('essays')}
           >
-            <EssaysApp onClose={() => closeWindow('essays')} />
+            <EssaysApp onClose={() => closeWindow('essays')} onOpenEssay={openEssayWindow} />
           </Window>
         )}
         {windowStates.about.isOpen && (
@@ -385,6 +450,29 @@ const Index = () => {
             <SimpleCalculator onClose={() => closeWindow('calculator')} />
           </Window>
         )}
+        
+        {/* Essay Windows */}
+        {Object.entries(essayWindows)
+          .filter(([_, windowState]) => windowState.isOpen)
+          .map(([windowId, windowState]) => {
+            const essayId = windowId.replace('essay-', '');
+            return (
+              <Window
+                key={windowId}
+                title={windowState.essay.title}
+                onClose={() => closeEssayWindow(essayId)}
+                initialPosition={{ x: 200 + (Object.keys(essayWindows).length * 30), y: 100 + (Object.keys(essayWindows).length * 30) }}
+                initialSize={{ width: 700, height: 600 }}
+                zIndex={windowState.zIndex}
+                onFocus={() => focusEssayWindow(essayId)}
+              >
+                <EssayViewer 
+                  essay={windowState.essay} 
+                  onClose={() => closeEssayWindow(essayId)} 
+                />
+              </Window>
+            );
+          })}
       </div>
 
       <SystemTray />

@@ -5,47 +5,15 @@ import { essayService } from '@/utils/essayService';
 import { Essay } from '@/utils/supabaseTypes';
 import { cn } from '@/lib/utils';
 import { checkSupabaseConnection } from '@/utils/supabaseConfig';
-import DOMPurify from 'dompurify';
 
 interface EssaysAppProps {
   onClose: () => void;
+  onOpenEssay: (essay: Essay) => void;
 }
 
-const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
+const EssaysApp: React.FC<EssaysAppProps> = ({ onClose, onOpenEssay }) => {
   const [essays, setEssays] = useState<Essay[]>([]);
-  const [expandedEssay, setExpandedEssay] = useState<string | null>(null);
   
-  // Helper function to safely render content (HTML or plain text)
-  const renderContent = (content: string, maxLength: number = 1000) => {
-    // Check if content contains HTML tags
-    const hasHtmlTags = /<[^>]*>/g.test(content);
-    
-    if (hasHtmlTags) {
-      // Sanitize HTML content
-      const sanitizedContent = DOMPurify.sanitize(content);
-      const truncatedContent = sanitizedContent.length > maxLength 
-        ? sanitizedContent.substring(0, maxLength) + '...' 
-        : sanitizedContent;
-      
-      return (
-        <div 
-          className="text-xs leading-relaxed text-mac-black prose prose-xs max-w-none"
-          dangerouslySetInnerHTML={{ __html: truncatedContent }}
-        />
-      );
-    } else {
-      // Handle plain text content (backward compatibility)
-      const truncatedContent = content.length > maxLength 
-        ? content.substring(0, maxLength) + '...' 
-        : content;
-      
-      return (
-        <p className="text-xs leading-relaxed text-mac-black whitespace-pre-line">
-          {truncatedContent}
-        </p>
-      );
-    }
-  };
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('Loading essays...');
@@ -196,28 +164,10 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
     return `${minutes} min read`;
   };
 
-  const toggleEssayExpansion = (essayId: string) => {
-    setExpandedEssay(expandedEssay === essayId ? null : essayId);
+  const handleEssayClick = (essay: Essay) => {
+    onOpenEssay(essay);
   };
 
-  // Extract quote from content
-  const extractQuote = (content: string): { quote: string | null; content: string } => {
-    // Check if content starts with a quote marker (> or >>)
-    const quoteRegex = /^(>>?)\s*"([^"]+)"\s*(?:-\s*(.+?))?(?:\n|$)/;
-    const match = content.match(quoteRegex);
-    
-    if (match) {
-      const quote = match[2];
-      const author = match[3] || '';
-      const remainingContent = content.replace(quoteRegex, '').trim();
-      return {
-        quote: author ? `"${quote}" - ${author}` : `"${quote}"`,
-        content: remainingContent
-      };
-    }
-    
-    return { quote: null, content };
-  };
 
 
   // Loading state
@@ -292,15 +242,11 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
         ) : (
           <div className="space-y-3">
             {essays.map((essay) => {
-              const { quote, content } = extractQuote(essay.content);
               return (
                 <div
                   key={essay.id}
-                  className={cn(
-                    "bg-mac-white mac-border-outset cursor-pointer transition-all",
-                    expandedEssay === essay.id && "mac-border-inset"
-                  )}
-                  onClick={() => toggleEssayExpansion(essay.id)}
+                  className="bg-mac-white mac-border-outset cursor-pointer transition-all hover:mac-border-inset"
+                  onClick={() => handleEssayClick(essay)}
                 >
                   <div className="p-4">
                     {/* Essay header */}
@@ -321,35 +267,19 @@ const EssaysApp: React.FC<EssaysAppProps> = ({ onClose }) => {
                     </div>
                     
                     {/* Excerpt */}
-                    {essay.excerpt && !expandedEssay && (
+                    {essay.excerpt && (
                       <p className="text-xs text-mac-dark-gray line-clamp-2">
                         {essay.excerpt}
                       </p>
                     )}
-                  </div>
-                  
-                  {/* Expanded content */}
-                  {expandedEssay === essay.id && (
-                    <div className="px-4 pb-4 border-t border-mac-medium-gray">
-                      {quote && (
-                        <div className="my-3">
-                          <div className="bg-cream-50 mac-border-inset p-3">
-                            <p className="text-xs text-mac-dark-gray italic text-center">
-                              {quote}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      <div className="bg-mac-light-gray mac-border-inset p-3">
-                        {renderContent(content, 1000)}
-                      </div>
-                      <div className="mt-3 text-center">
-                        <span className="text-xs text-mac-dark-gray">
-                          💭 Click again to collapse
-                        </span>
-                      </div>
+                    
+                    {/* Click hint */}
+                    <div className="mt-3 text-center">
+                      <span className="text-xs text-mac-dark-gray">
+                        📖 Click to open in new window
+                      </span>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}

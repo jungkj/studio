@@ -35,7 +35,7 @@ const WelcomeWindow: React.FC<WelcomeWindowProps> = ({ onClose }) => {
           </p>
           
           <div className="text-center text-xs text-mac-dark-gray">
-            Double-click desktop icons to get started!
+            Start exploring by clicking the desktop icons!
           </div>
         </div>
       </div>
