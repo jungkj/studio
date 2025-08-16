@@ -7,7 +7,7 @@ import "@/globals.css";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mac OS Classic Desktop Environment',
+  title: 'Andy Jung',
   description: 'Step back into the 1990s with this nostalgic recreation of the classic Mac OS desktop experience',
   icons: {
     icon: '/favicon.ico',

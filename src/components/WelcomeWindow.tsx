@@ -24,14 +24,10 @@ const WelcomeWindow: React.FC<WelcomeWindowProps> = ({ onClose }) => {
             <div className="text-sm font-bold">Hey there!</div>
           </div>
           
-          <p className="mb-2">
-            I'm Andy Jung, a recent BC grad exploring the intersection of finance, 
-            tech, and creativity.
-          </p>
-          
           <p className="mb-3">
-            This retro Mac interface is my digital playground. Click around to 
-            explore my work, thoughts, and projects.
+            graduated from bc in 24', currently working on riscura.app and building things.
+            <br /><br />
+            Click around to explore my work, thoughts, projects, etc.
           </p>
           
           <div className="text-center text-xs text-mac-dark-gray">
